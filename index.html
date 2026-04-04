@@ -91,9 +91,12 @@
           rgba(70,50,30,0.08) 0%,
           transparent 70%
         );
-      overflow: hidden;
+      overflow-x: hidden;
       user-select: none;
       -webkit-user-select: none;
+      flex-direction: column;
+      padding: 15vh 0;
+      gap: 15vh;
     }
 
     .card-stack {
@@ -136,14 +139,30 @@
       box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 3px 8px rgba(0,0,0,0.35);
     }
 
+    .brief-wrapper {
+      width: 800px;
+      border-radius: 4px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .brief-wrapper canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+
     /* Responsive scaling */
-    @media (max-width: 760px) {
+    @media (max-width: 860px) {
       .card-stack,
       .card-wrapper {
         width: 90vw;
         height: calc(90vw * 400 / 700);
       }
 
+      .brief-wrapper {
+        width: 92vw;
+      }
     }
   </style>
 </head>
@@ -155,6 +174,9 @@
     <div class="card-wrapper" id="card1wrapper" data-card="1">
       <canvas id="card1" width="700" height="400"></canvas>
     </div>
+  </div>
+  <div class="brief-wrapper">
+    <canvas id="brief"></canvas>
   </div>
   <script>
     const CARDS = [
@@ -288,8 +310,138 @@
       letterpress(data.bottomLine, w / 2, h - pad);
     }
 
+    function wrapText(ctx, text, maxWidth) {
+      const words = text.split(' ');
+      const lines = [];
+      let line = '';
+      for (const word of words) {
+        const test = line ? line + ' ' + word : word;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = test;
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function drawBrief() {
+      const canvas = document.getElementById('brief');
+      const dpr = window.devicePixelRatio || 1;
+      const w = 800;
+      const pad = 60;
+      const textW = w - pad * 2;
+      const lineH = 26;
+
+      // Pre-measure height
+      const tmpCanvas = document.createElement('canvas');
+      tmpCanvas.width = w;
+      const tmpCtx = tmpCanvas.getContext('2d');
+
+      const paragraphs = [
+        'Brian Richter is the founder and chief executive officer of Aviary Tech, a company dedicated to Decentralized Identity. His work centers on the W3C standards for Decentralized Identifiers and Verifiable Credentials, building the infrastructure for digital identity that is self-sovereign, portable, and interoperable. The premise is simple: identity should not depend on any single platform or authority.',
+        'He is also a software engineer at Codex and Defined. Codex indexes real-time data for over seventy million tokens across more than eighty blockchain networks, delivering pricing, charts, wallet balances, and market analytics with sub-second latency. Their clients include Coinbase, Uniswap, TradingView, and Farcaster. Defined provides the analytics and discovery layer built on this infrastructure.',
+        'He is the creator of Originals, a minimal protocol for creating, discovering, and transferring digital assets with cryptographically verifiable provenance. Assets are represented by Decentralized Identifiers and Verifiable Credentials that migrate through three layers: private, public, and transferable. Ownership settles exclusively on Bitcoin, ensuring that economic value is secured by the most resilient consensus network in existence. The protocol requires no smart contracts, no trusted third parties, and no bespoke blockchains.',
+        'A proposal for the Praxis project is forthcoming.'
+      ];
+
+      // Calculate total height
+      tmpCtx.font = `400 15px ${REG}`;
+      tmpCtx.letterSpacing = '0.3px';
+      let totalLines = 0;
+      const wrappedParas = paragraphs.map(p => {
+        const lines = wrapText(tmpCtx, p, textW);
+        totalLines += lines.length;
+        return lines;
+      });
+
+      // Header area + paragraphs + gaps + padding
+      const headerH = 100;
+      const paraGap = lineH * 0.8;
+      const h = headerH + (totalLines * lineH) + ((paragraphs.length - 1) * paraGap) + pad + 20;
+
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.height = (h * (800 / w)) + 'px';
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      // Card background
+      ctx.fillStyle = '#ede8df';
+      ctx.beginPath();
+      ctx.roundRect(0, 0, w, h, 3);
+      ctx.fill();
+
+      // Subtle edge
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.roundRect(0.5, 0.5, w - 1, h - 1, 3);
+      ctx.stroke();
+
+      const textColor = '#4a4540';
+
+      function letterpress(text, x, y) {
+        ctx.shadowColor = 'rgba(0,0,0,0.15)';
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = -0.5;
+        ctx.shadowBlur = 0.5;
+        ctx.fillText(text, x, y);
+        ctx.shadowColor = 'rgba(255,255,255,0.6)';
+        ctx.shadowOffsetY = 1;
+        ctx.shadowBlur = 0;
+        ctx.fillText(text, x, y);
+        ctx.shadowColor = 'transparent';
+      }
+
+      // --- Header: BRIEF ---
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = '#3a3632';
+      ctx.font = `400 20px ${SC}`;
+      ctx.letterSpacing = '6px';
+      letterpress('Brief', pad + textW / 2, pad - 10);
+
+      // Thin rule
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(pad, pad + 22);
+      ctx.lineTo(w - pad, pad + 22);
+      ctx.stroke();
+
+      // RE: line
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#3a3632';
+      ctx.font = `400 14px ${SC}`;
+      ctx.letterSpacing = '2px';
+      letterpress('re: Brian Richter', pad, pad + 34);
+
+      // --- Body paragraphs ---
+      ctx.font = `400 15px ${REG}`;
+      ctx.letterSpacing = '0.3px';
+      ctx.fillStyle = textColor;
+      ctx.textBaseline = 'top';
+
+      let curY = headerH;
+
+      wrappedParas.forEach((lines, pIdx) => {
+        lines.forEach(line => {
+          letterpress(line, pad, curY);
+          curY += lineH;
+        });
+        if (pIdx < wrappedParas.length - 1) {
+          curY += paraGap;
+        }
+      });
+    }
+
     document.fonts.ready.then(() => {
       CARDS.forEach(card => drawCard(card.id, card));
+      drawBrief();
 
       // Set initial positions
       document.getElementById('card1wrapper').classList.add('front');
