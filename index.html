@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Personal website">
   <meta name="robots" content="noindex, nofollow">
-  <title>Brian Richter</title>
+  <title>.</title>
+  <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -153,9 +154,13 @@
 
     function drawCard(canvasId, data) {
       const canvas = document.getElementById(canvasId);
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = 700 * dpr;
+      canvas.height = 400 * dpr;
       const ctx = canvas.getContext('2d');
-      const w = canvas.width;
-      const h = canvas.height;
+      ctx.scale(dpr, dpr);
+      const w = 700;
+      const h = 400;
 
       // Card background — cream/bone
       ctx.fillStyle = '#f5f0e8';
@@ -197,6 +202,9 @@
       ctx.font = '400 15px "Cormorant Garamond", serif';
       ctx.letterSpacing = '3px';
       ctx.fillText(data.company, w / 2, h * 0.56);
+
+      // Clear shadow before drawing rule
+      ctx.shadowColor = 'transparent';
 
       // Thin rule
       ctx.strokeStyle = 'rgba(180, 170, 155, 0.4)';
