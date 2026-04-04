@@ -87,33 +87,8 @@
       box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    .email-link {
-      position: absolute;
-      z-index: 10;
-      cursor: pointer;
-    }
-
-    .email-link.top-left {
-      top: 8%;
-      left: 6%;
-      width: 30%;
-      height: 12%;
-    }
-
-    .email-link.bottom {
-      bottom: 6%;
-      left: 15%;
-      width: 70%;
-      height: 10%;
-    }
-
     .card-wrapper.front:hover {
       box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 3px 8px rgba(0,0,0,0.35);
-    }
-
-    .email-link:hover {
-      background: rgba(0,0,0,0.03);
-      border-radius: 2px;
     }
 
     /* Responsive scaling */
@@ -131,13 +106,9 @@
   <div class="card-stack" id="cardStack">
     <div class="card-wrapper" id="card2wrapper" data-card="2">
       <canvas id="card2" width="700" height="400"></canvas>
-      <a class="email-link top-left" href="mailto:brian@defined.fi"></a>
-      <a class="email-link bottom" href="mailto:brian@defined.fi"></a>
     </div>
     <div class="card-wrapper" id="card1wrapper" data-card="1">
       <canvas id="card1" width="700" height="400"></canvas>
-      <a class="email-link top-left" href="mailto:brian@aviary.tech"></a>
-      <a class="email-link bottom" href="mailto:brian@aviary.tech"></a>
     </div>
   </div>
   <script>
@@ -149,13 +120,13 @@
         title: 'Chief Executive Officer',
         company: 'Aviary Tech',
         email: 'brian@aviary.tech',
-        bottomLine: 'brian@aviary.tech'
+        bottomLine: '103 - 1208 Wharf St, Victoria BC V8W 3B9'
       },
       {
         id: 'card2',
         firstName: 'Brian',
         lastName: 'RICHTER',
-        title: 'Engineer',
+        title: 'Software Engineer',
         company: 'Codex / Defined',
         email: 'brian@defined.fi',
         bottomLine: 'brian@defined.fi'
@@ -214,28 +185,28 @@
       const nameY = h * 0.46;
 
       // Measure to position first + last together
-      ctx.font = '400 18px "EB Garamond", serif';
+      ctx.font = '400 15px "EB Garamond", serif';
       ctx.letterSpacing = '3px';
       const firstW = ctx.measureText(data.firstName).width;
 
-      ctx.font = '600 24px "EB Garamond", serif';
-      ctx.letterSpacing = '5px';
+      ctx.font = '400 18px "EB Garamond", serif';
+      ctx.letterSpacing = '4px';
       const lastW = ctx.measureText(data.lastName).width;
 
-      const gap = 10;
+      const gap = 8;
       const totalW = firstW + gap + lastW;
       const startX = (w - totalW) / 2;
 
       // Draw first name
       ctx.fillStyle = '#2c2824';
       ctx.textAlign = 'left';
-      ctx.font = '400 18px "EB Garamond", serif';
+      ctx.font = '400 15px "EB Garamond", serif';
       ctx.letterSpacing = '3px';
       ctx.fillText(data.firstName, startX, nameY);
 
       // Draw last name
-      ctx.font = '600 24px "EB Garamond", serif';
-      ctx.letterSpacing = '5px';
+      ctx.font = '400 18px "EB Garamond", serif';
+      ctx.letterSpacing = '4px';
       ctx.fillText(data.lastName, startX + firstW + gap, nameY);
 
       // --- Title below name ---
