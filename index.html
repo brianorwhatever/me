@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal website">
+  <meta name="robots" content="noindex, nofollow">
   <title>Brian Richter</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,12 +97,27 @@
       cursor: pointer;
     }
 
+    .card-wrapper.front:hover {
+      box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 3px 8px rgba(0,0,0,0.35);
+    }
+
+    .email-link:hover {
+      background: rgba(0,0,0,0.03);
+      border-radius: 2px;
+    }
+
     /* Responsive scaling */
     @media (max-width: 760px) {
       .card-stack,
       .card-wrapper {
         width: 90vw;
         height: calc(90vw * 400 / 700);
+      }
+
+      .email-link {
+        bottom: calc(90vw * 400 / 700 * 0.15);
+        width: calc(90vw * 0.37);
+        height: calc(90vw * 400 / 700 * 0.08);
       }
     }
   </style>
