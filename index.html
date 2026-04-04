@@ -222,30 +222,30 @@
 
       document.getElementById('card1wrapper').style.zIndex = '2';
       document.getElementById('card2wrapper').style.zIndex = '1';
-    });
 
-    let card1Front = true;
+      let card1Front = true;
 
-    document.getElementById('cardStack').addEventListener('click', (e) => {
-      // Don't swap if clicking the email link
-      if (e.target.closest('.email-link')) return;
+      document.getElementById('cardStack').addEventListener('click', (e) => {
+        // Don't swap if clicking the email link
+        if (e.target.closest('.email-link')) return;
 
-      const wrapper1 = document.getElementById('card1wrapper');
-      const wrapper2 = document.getElementById('card2wrapper');
+        const wrapper1 = document.getElementById('card1wrapper');
+        const wrapper2 = document.getElementById('card2wrapper');
 
-      card1Front = !card1Front;
+        card1Front = !card1Front;
 
-      if (card1Front) {
-        wrapper1.classList.replace('back', 'front');
-        wrapper2.classList.replace('front', 'back');
-        wrapper1.style.zIndex = '2';
-        wrapper2.style.zIndex = '1';
-      } else {
-        wrapper1.classList.replace('front', 'back');
-        wrapper2.classList.replace('back', 'front');
-        wrapper1.style.zIndex = '1';
-        wrapper2.style.zIndex = '2';
-      }
+        if (card1Front) {
+          wrapper1.classList.replace('back', 'front');
+          wrapper2.classList.replace('front', 'back');
+          wrapper1.style.zIndex = '2';
+          wrapper2.style.zIndex = '1';
+        } else {
+          wrapper1.classList.replace('front', 'back');
+          wrapper2.classList.replace('back', 'front');
+          wrapper1.style.zIndex = '1';
+          wrapper2.style.zIndex = '2';
+        }
+      });
     });
   </script>
 </body>
