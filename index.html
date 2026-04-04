@@ -9,7 +9,7 @@
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after {
       margin: 0;
@@ -89,13 +89,22 @@
 
     .email-link {
       position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 260px;
-      height: 30px;
       z-index: 10;
       cursor: pointer;
+    }
+
+    .email-link.top-left {
+      top: 8%;
+      left: 6%;
+      width: 30%;
+      height: 12%;
+    }
+
+    .email-link.bottom {
+      bottom: 6%;
+      left: 15%;
+      width: 70%;
+      height: 10%;
     }
 
     .card-wrapper.front:hover {
@@ -115,11 +124,6 @@
         height: calc(90vw * 400 / 700);
       }
 
-      .email-link {
-        bottom: calc(90vw * 400 / 700 * 0.15);
-        width: calc(90vw * 0.37);
-        height: calc(90vw * 400 / 700 * 0.08);
-      }
     }
   </style>
 </head>
@@ -127,28 +131,34 @@
   <div class="card-stack" id="cardStack">
     <div class="card-wrapper" id="card2wrapper" data-card="2">
       <canvas id="card2" width="700" height="400"></canvas>
-      <a class="email-link" id="email2link" href="mailto:brian@defined.fi"></a>
+      <a class="email-link top-left" href="mailto:brian@defined.fi"></a>
+      <a class="email-link bottom" href="mailto:brian@defined.fi"></a>
     </div>
     <div class="card-wrapper" id="card1wrapper" data-card="1">
       <canvas id="card1" width="700" height="400"></canvas>
-      <a class="email-link" id="email1link" href="mailto:brian@aviary.tech"></a>
+      <a class="email-link top-left" href="mailto:brian@aviary.tech"></a>
+      <a class="email-link bottom" href="mailto:brian@aviary.tech"></a>
     </div>
   </div>
   <script>
     const CARDS = [
       {
         id: 'card1',
-        name: 'BRIAN RICHTER',
+        firstName: 'Brian',
+        lastName: 'RICHTER',
         title: 'Chief Executive Officer',
         company: 'Aviary Tech',
-        email: 'brian@aviary.tech'
+        email: 'brian@aviary.tech',
+        bottomLine: 'brian@aviary.tech'
       },
       {
         id: 'card2',
-        name: 'BRIAN RICHTER',
+        firstName: 'Brian',
+        lastName: 'RICHTER',
         title: 'Engineer',
         company: 'Codex / Defined',
-        email: 'brian@defined.fi'
+        email: 'brian@defined.fi',
+        bottomLine: 'brian@defined.fi'
       }
     ];
 
@@ -161,64 +171,90 @@
       ctx.scale(dpr, dpr);
       const w = 700;
       const h = 400;
+      const pad = 42;
 
-      // Card background — cream/bone
-      ctx.fillStyle = '#f5f0e8';
+      // Card background — warm bone/cream like the film
+      ctx.fillStyle = '#ede8df';
       ctx.beginPath();
-      ctx.roundRect(0, 0, w, h, 6);
+      ctx.roundRect(0, 0, w, h, 3);
       ctx.fill();
 
-      // Subtle inner border
-      ctx.strokeStyle = 'rgba(180, 170, 155, 0.3)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.roundRect(1, 1, w - 2, h - 2, 5);
-      ctx.stroke();
-
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-
-      // Name — large, letterspaced
-      ctx.fillStyle = '#2c2824';
-      ctx.font = '500 28px "Cormorant Garamond", serif';
-      ctx.letterSpacing = '8px';
-      ctx.shadowColor = 'rgba(255,255,255,0.6)';
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 1;
-      ctx.shadowBlur = 0;
-      ctx.fillText(data.name, w / 2, h * 0.30);
-
-      // Reset shadow for remaining text
-      ctx.shadowColor = 'rgba(255,255,255,0.4)';
-
-      // Title
-      ctx.fillStyle = '#4a4540';
-      ctx.font = '300 16px "Cormorant Garamond", serif';
-      ctx.letterSpacing = '4px';
-      ctx.fillText(data.title, w / 2, h * 0.44);
-
-      // Company
-      ctx.fillStyle = '#4a4540';
-      ctx.font = '400 15px "Cormorant Garamond", serif';
-      ctx.letterSpacing = '3px';
-      ctx.fillText(data.company, w / 2, h * 0.56);
-
-      // Clear shadow before drawing rule
-      ctx.shadowColor = 'transparent';
-
-      // Thin rule
-      ctx.strokeStyle = 'rgba(180, 170, 155, 0.4)';
+      // Very subtle edge
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
       ctx.lineWidth = 0.5;
       ctx.beginPath();
-      ctx.moveTo(w * 0.35, h * 0.66);
-      ctx.lineTo(w * 0.65, h * 0.66);
+      ctx.roundRect(0.5, 0.5, w - 1, h - 1, 3);
       ctx.stroke();
 
-      // Email
-      ctx.fillStyle = '#5a5550';
-      ctx.font = '300 14px "Cormorant Garamond", serif';
+      // Emboss-style shadow for all text
+      ctx.shadowColor = 'rgba(255,255,255,0.5)';
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0.5;
+      ctx.shadowBlur = 0;
+
+      // --- Top-left: email (where phone number goes in the film) ---
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = '#3a3632';
+      ctx.font = '400 13px "Cormorant SC", serif';
+      ctx.letterSpacing = '1.5px';
+      ctx.fillText(data.email, pad, pad);
+
+      // --- Top-right: company name + division ---
+      ctx.textAlign = 'right';
+      ctx.fillStyle = '#3a3632';
+      ctx.font = '600 14.5px "Cormorant SC", serif';
       ctx.letterSpacing = '2px';
-      ctx.fillText(data.email, w / 2, h * 0.77);
+      ctx.fillText(data.company, w - pad, pad);
+
+      // --- Center: Name ---
+      // "Brian" in smaller small-caps, "RICHTER" in larger caps
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const nameY = h * 0.46;
+
+      // Measure to position first + last together
+      ctx.font = '400 18px "Cormorant SC", serif';
+      ctx.letterSpacing = '3px';
+      const firstW = ctx.measureText(data.firstName).width;
+
+      ctx.font = '600 24px "Cormorant SC", serif';
+      ctx.letterSpacing = '5px';
+      const lastW = ctx.measureText(data.lastName).width;
+
+      const gap = 10;
+      const totalW = firstW + gap + lastW;
+      const startX = (w - totalW) / 2;
+
+      // Draw first name
+      ctx.fillStyle = '#2c2824';
+      ctx.textAlign = 'left';
+      ctx.font = '400 18px "Cormorant SC", serif';
+      ctx.letterSpacing = '3px';
+      ctx.fillText(data.firstName, startX, nameY);
+
+      // Draw last name
+      ctx.font = '600 24px "Cormorant SC", serif';
+      ctx.letterSpacing = '5px';
+      ctx.fillText(data.lastName, startX + firstW + gap, nameY);
+
+      // --- Title below name ---
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#3a3632';
+      ctx.font = '400 13px "Cormorant SC", serif';
+      ctx.letterSpacing = '2.5px';
+      ctx.fillText(data.title, w / 2, nameY + 30);
+
+      // --- Bottom line: email (like address/fax/telex line in the film) ---
+      ctx.shadowColor = 'transparent';
+      ctx.shadowColor = 'rgba(255,255,255,0.5)';
+      ctx.shadowOffsetY = 0.5;
+      ctx.fillStyle = '#4a4540';
+      ctx.font = '400 11px "Cormorant SC", serif';
+      ctx.letterSpacing = '1.5px';
+      ctx.fillText(data.bottomLine, w / 2, h - pad);
+
+      ctx.shadowColor = 'transparent';
     }
 
     document.fonts.ready.then(() => {
