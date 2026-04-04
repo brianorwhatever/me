@@ -47,9 +47,75 @@
       user-select: none;
       -webkit-user-select: none;
     }
+
+    .card-stack {
+      position: relative;
+      width: 700px;
+      height: 400px;
+      cursor: pointer;
+    }
+
+    .card-wrapper {
+      position: absolute;
+      width: 700px;
+      height: 400px;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .card-wrapper canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    /* Back card offset */
+    .card-wrapper.back {
+      transform: translate(12px, 12px);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    /* Front card */
+    .card-wrapper.front {
+      transform: translate(-4px, -4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .email-link {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      height: 30px;
+      z-index: 10;
+      cursor: pointer;
+    }
+
+    /* Responsive scaling */
+    @media (max-width: 760px) {
+      .card-stack,
+      .card-wrapper {
+        width: 90vw;
+        height: calc(90vw * 400 / 700);
+      }
+    }
   </style>
 </head>
 <body>
+  <div class="card-stack" id="cardStack">
+    <div class="card-wrapper" id="card2wrapper" data-card="2">
+      <canvas id="card2" width="700" height="400"></canvas>
+      <a class="email-link" id="email2link" href="mailto:brian@defined.fi"></a>
+    </div>
+    <div class="card-wrapper" id="card1wrapper" data-card="1">
+      <canvas id="card1" width="700" height="400"></canvas>
+      <a class="email-link" id="email1link" href="mailto:brian@aviary.tech"></a>
+    </div>
+  </div>
   <script>
     // Will be filled in subsequent tasks
   </script>
