@@ -9,7 +9,7 @@
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after {
       margin: 0;
@@ -116,22 +116,26 @@
       {
         id: 'card1',
         firstName: 'Brian',
-        lastName: 'RICHTER',
+        lastName: 'Richter',
         title: 'Chief Executive Officer',
-        company: 'Aviary Tech',
+        companyLine1: 'Aviary Tech',
+        companyLine2: null,
         email: 'brian@aviary.tech',
         bottomLine: '103 - 1208 Wharf St, Victoria BC V8W 3B9'
       },
       {
         id: 'card2',
         firstName: 'Brian',
-        lastName: 'RICHTER',
+        lastName: 'Richter',
         title: 'Software Engineer',
-        company: 'Codex / Defined',
+        companyLine1: 'Codex / Defined',
+        companyLine2: null,
         email: 'brian@defined.fi',
         bottomLine: 'brian@defined.fi'
       }
     ];
+
+    const SC = '"Cormorant SC", serif';
 
     function drawCard(canvasId, data) {
       const canvas = document.getElementById(canvasId);
@@ -144,7 +148,7 @@
       const h = 400;
       const pad = 42;
 
-      // Card background — warm bone/cream like the film
+      // Card background — warm bone/cream
       ctx.fillStyle = '#ede8df';
       ctx.beginPath();
       ctx.roundRect(0, 0, w, h, 3);
@@ -157,72 +161,81 @@
       ctx.roundRect(0.5, 0.5, w - 1, h - 1, 3);
       ctx.stroke();
 
-      // Emboss-style shadow for all text
-      ctx.shadowColor = 'rgba(255,255,255,0.5)';
+      // Letterpress emboss — subtle white below each glyph
+      ctx.shadowColor = 'rgba(255,255,255,0.45)';
       ctx.shadowOffsetX = 0;
       ctx.shadowOffsetY = 0.5;
       ctx.shadowBlur = 0;
 
-      // --- Top-left: email (where phone number goes in the film) ---
+      const textColor = '#3a3632';
+
+      // --- Top-left: email (where phone goes in film) ---
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
-      ctx.fillStyle = '#3a3632';
-      ctx.font = '400 13px "EB Garamond", serif';
-      ctx.letterSpacing = '1.5px';
+      ctx.fillStyle = textColor;
+      ctx.font = `300 13px ${SC}`;
+      ctx.letterSpacing = '1px';
       ctx.fillText(data.email, pad, pad);
 
-      // --- Top-right: company name + division ---
+      // --- Top-right: company (like Pierce & Pierce) ---
       ctx.textAlign = 'right';
-      ctx.fillStyle = '#3a3632';
-      ctx.font = '600 14.5px "EB Garamond", serif';
-      ctx.letterSpacing = '2px';
-      ctx.fillText(data.company, w - pad, pad);
+      ctx.fillStyle = textColor;
+      ctx.font = `400 14px ${SC}`;
+      ctx.letterSpacing = '1.5px';
+      ctx.fillText(data.companyLine1, w - pad, pad);
+      if (data.companyLine2) {
+        ctx.font = `300 11px ${SC}`;
+        ctx.letterSpacing = '1.5px';
+        ctx.fillText(data.companyLine2, w - pad, pad + 18);
+      }
 
       // --- Center: Name ---
-      // "Brian" in smaller small-caps, "RICHTER" in larger caps
+      // Cormorant SC renders lowercase as small caps automatically
+      // so "Brian" → small caps, "Richter" at a larger size → larger small caps
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#2c2824';
       const nameY = h * 0.46;
 
-      // Measure to position first + last together
-      ctx.font = '400 15px "EB Garamond", serif';
-      ctx.letterSpacing = '3px';
+      // Measure first name (small caps, smaller)
+      ctx.font = `400 15px ${SC}`;
+      ctx.letterSpacing = '2px';
       const firstW = ctx.measureText(data.firstName).width;
 
-      ctx.font = '400 18px "EB Garamond", serif';
-      ctx.letterSpacing = '4px';
+      // Measure last name (small caps, larger)
+      ctx.font = `400 19px ${SC}`;
+      ctx.letterSpacing = '3px';
       const lastW = ctx.measureText(data.lastName).width;
 
-      const gap = 8;
+      const gap = 7;
       const totalW = firstW + gap + lastW;
       const startX = (w - totalW) / 2;
 
-      // Draw first name
-      ctx.fillStyle = '#2c2824';
+      // Draw first name — small caps at smaller size
       ctx.textAlign = 'left';
-      ctx.font = '400 15px "EB Garamond", serif';
-      ctx.letterSpacing = '3px';
+      ctx.font = `400 15px ${SC}`;
+      ctx.letterSpacing = '2px';
       ctx.fillText(data.firstName, startX, nameY);
 
-      // Draw last name
-      ctx.font = '400 18px "EB Garamond", serif';
-      ctx.letterSpacing = '4px';
+      // Draw last name — small caps at larger size
+      ctx.font = `400 19px ${SC}`;
+      ctx.letterSpacing = '3px';
       ctx.fillText(data.lastName, startX + firstW + gap, nameY);
 
-      // --- Title below name ---
+      // --- Title ---
       ctx.textAlign = 'center';
-      ctx.fillStyle = '#3a3632';
-      ctx.font = '400 13px "EB Garamond", serif';
-      ctx.letterSpacing = '2.5px';
-      ctx.fillText(data.title, w / 2, nameY + 30);
+      ctx.fillStyle = textColor;
+      ctx.font = `300 13px ${SC}`;
+      ctx.letterSpacing = '2px';
+      ctx.fillText(data.title, w / 2, nameY + 28);
 
-      // --- Bottom line: email (like address/fax/telex line in the film) ---
+      // --- Bottom line ---
       ctx.shadowColor = 'transparent';
-      ctx.shadowColor = 'rgba(255,255,255,0.5)';
+      ctx.shadowColor = 'rgba(255,255,255,0.45)';
       ctx.shadowOffsetY = 0.5;
       ctx.fillStyle = '#4a4540';
-      ctx.font = '400 11px "EB Garamond", serif';
-      ctx.letterSpacing = '1.5px';
+      ctx.font = `300 10.5px ${SC}`;
+      ctx.letterSpacing = '1px';
       ctx.fillText(data.bottomLine, w / 2, h - pad);
 
       ctx.shadowColor = 'transparent';
