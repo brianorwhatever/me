@@ -162,6 +162,14 @@
       border-radius: 4px;
     }
 
+    .proposal-wrapper {
+      aspect-ratio: auto;
+    }
+
+    .proposal-wrapper canvas {
+      height: auto;
+    }
+
     /* Responsive scaling */
     @media (max-width: 860px) {
       .card-stack,
@@ -187,6 +195,9 @@
   </div>
   <div class="brief-wrapper">
     <canvas id="brief"></canvas>
+  </div>
+  <div class="brief-wrapper proposal-wrapper">
+    <canvas id="proposal"></canvas>
   </div>
   <script>
     const CARDS = [
@@ -432,9 +443,262 @@
       });
     }
 
+    function drawProposal() {
+      const canvas = document.getElementById('proposal');
+      const dpr = window.devicePixelRatio || 1;
+      const w = 680;
+      const pad = 55;
+      const textW = w - pad * 2;
+      const lineH = 24;
+      const SANS = '"Cormorant Infant", sans-serif';
+
+      // Content sections: each has a type (heading, para, bullets, table, spacer)
+      const content = [
+        { type: 'heading', text: '1. Problem and Opportunity' },
+        { type: 'para', text: 'A photographer publishes a limited-edition digital print. Over time, the work is collected, resold, and eventually exhibited online — but no single system can tell the full story of its creation, authenticity, and chain of custody. The photographer\'s original signing event is tied to a platform that may disappear. A collector\'s proof of ownership lives in a marketplace database. And anyone who wants to verify the work\'s history must trust several intermediaries whose authority is never clearly stated.' },
+        { type: 'para', text: 'This scenario illustrates three linked problems in digital provenance today. First, provenance is fragile — a claim of authenticity often depends on infrastructure outside the asset itself. Second, trust assumptions are opaque — users rely on custodians without a clear account of what those actors can and cannot do. Third, privacy is poorly handled — public systems overexpose metadata while private workflows sacrifice auditability.' },
+        { type: 'para', text: 'This praxis addresses those problems by studying how digital provenance, ownership transfer, and selective disclosure can be composed into a single layered protocol.' },
+        { type: 'spacer' },
+        { type: 'heading', text: '2. Proposed Praxis' },
+        { type: 'para', text: 'The proposed praxis extends the Originals protocol — an existing multi-layer digital asset provenance system built by Aviary Tech — into a research-grade cryptographic systems project organized around layered ownership states. The concrete artifact is a protocol implementation comprising an SDK, DID-method libraries, a Bitcoin inscription layer, and a privacy-aware credential engine, evaluated against explicit security and privacy criteria.' },
+        { type: 'para', text: 'The protocol is organized into four layers, each corresponding to a distinct class of trust requirement:' },
+        { type: 'bullets', items: [
+          'Private creation and local provenance — assets begin in low-cost, offline environments where provenance events can be recorded without publication.',
+          'Public discovery and selective disclosure — assets become discoverable through web-addressable identifiers while preserving control over which claims become public.',
+          'High-assurance ownership transfer — assets transition into stronger ownership environments with explicit verification rules.',
+          'Advanced ownership transitions — constrained shared-ownership or fractional-rights workflows supported as an application layer.'
+        ]},
+        { type: 'spacer' },
+        { type: 'heading', text: '3. Contribution Boundary' },
+        { type: 'para', text: 'The doctoral contribution is the systematic security, privacy, and trust evaluation of a layered provenance architecture — producing the adversary models, privacy tradeoff analysis, structured threat assessment, and empirical evidence that reveal where the architecture\'s guarantees hold, where they weaken, and what they cost.' },
+        { type: 'para', text: 'This praxis builds on a substantial existing engineering practice. The Originals protocol implementation comprises over 1,100 commits and already includes a working did:btco resolver and inscriber, verifiable credential issuance and verification, and an initial BBS+ selective disclosure library. The doctoral contribution begins where the engineering practice becomes the subject of systematic investigation.' },
+        { type: 'spacer' },
+        { type: 'heading', text: '4. Research Questions' },
+        { type: 'bullets', items: [
+          'How should a layered provenance protocol be modeled so that transitions between private, public, and high-value ownership states preserve clearly stated security guarantees?',
+          'Which privacy properties are most valuable in provenance systems, and what cryptographic mechanisms can support them without undermining public verifiability?',
+          'How can provenance claims, ownership records, and selective disclosure be composed so that users can audit authenticity without exposing unnecessary information?'
+        ]},
+        { type: 'spacer' },
+        { type: 'heading', text: '5. Methodology' },
+        { type: 'para', text: 'The project proceeds in four phases.' },
+        { type: 'subheading', text: 'Phase 1: Security Model and Provenance Core' },
+        { type: 'para', text: 'Formalizes the protocol structure for creation, discovery, and ownership transfer. Defines participants, adversaries, trust assumptions, and security goals. Produces a reference specification, verification invariants, and an implementation baseline.' },
+        { type: 'subheading', text: 'Phase 2: Privacy-Aware Provenance' },
+        { type: 'para', text: 'Integrates privacy-preserving techniques into provenance workflows. The primary mechanism is BBS+ selective disclosure, enabling holders to derive proofs that reveal only selected credential attributes while preserving verifiability. Evaluates how selective disclosure composes with provenance claims across layer transitions.' },
+        { type: 'subheading', text: 'Phase 3: Ownership Transition and Shared Rights' },
+        { type: 'para', text: 'Examines how the protocol supports constrained ownership partitioning or governance-based transfer scenarios. Includes comparative trust analysis of specific operator constraints against a trusted-operator baseline. Intentionally bounded so the dissertation remains viable if only a constrained prototype is completed.' },
+        { type: 'subheading', text: 'Phase 4: Evaluation' },
+        { type: 'para', text: 'Produces the empirical and analytical evidence needed for a strong praxis outcome. Includes STRIDE-based threat analysis with at least 15 specific threat scenarios, adversarial test suites, benchmark comparisons across deployment paths, and comparison against existing provenance systems.' },
+        { type: 'spacer' },
+        { type: 'heading', text: '6. Timeline' },
+        { type: 'table', rows: [
+          ['Phase 1', 'Q4 2026 – Q2 2027', 'Security model, core protocol spec'],
+          ['Phase 2', 'Q3 2027 – Q1 2028', 'BBS+ selective disclosure, privacy analysis'],
+          ['Phase 3', 'Q2 2028 – Q4 2028', 'Advanced ownership transitions, prototype'],
+          ['Phase 4', 'Q1 2029 – Q3 2029', 'Evaluation, benchmarks, dissertation']
+        ]},
+        { type: 'spacer' },
+        { type: 'heading', text: '7. Deliverables' },
+        { type: 'bullets', items: [
+          'A layered digital provenance protocol specification',
+          'A reference implementation and verification toolkit',
+          'A privacy-aware provenance design and evaluation',
+          'A bounded prototype for advanced ownership transitions',
+          'Performance, threat, and privacy analyses with defined comparison baselines',
+          'A DEng praxis dissertation integrating the architecture, implementation, and evidence'
+        ]},
+        { type: 'spacer' },
+        { type: 'heading', text: '8. Expected Contribution' },
+        { type: 'para', text: 'The main contribution of this praxis is a practical framework for secure and privacy-aware digital provenance across multiple ownership layers — independent of any single platform, application, or commercial deployment. Whether or not Aviary Tech or Codex continue to operate, the protocol architecture, trust analysis, privacy evaluation, and open-source implementation remain a reusable contribution to engineering knowledge.' },
+        { type: 'para', text: 'The strongest outcome is not merely a new application. It is a reusable architecture, implementation, and evidence base whose value does not depend on a specific commercial context.' },
+      ];
+
+      // Pre-calculate height
+      const tmpCanvas = document.createElement('canvas');
+      tmpCanvas.width = w;
+      const tmp = tmpCanvas.getContext('2d');
+
+      let totalH = pad + 80; // header area
+      content.forEach(item => {
+        if (item.type === 'spacer') { totalH += 15; return; }
+        if (item.type === 'heading') { totalH += 35; return; }
+        if (item.type === 'subheading') { totalH += 28; return; }
+        if (item.type === 'para') {
+          tmp.font = `300 14px ${SANS}`;
+          tmp.letterSpacing = '0.2px';
+          const lines = wrapText(tmp, item.text, textW);
+          totalH += lines.length * lineH + 10;
+          return;
+        }
+        if (item.type === 'bullets') {
+          tmp.font = `300 13px ${SANS}`;
+          item.items.forEach(b => {
+            const lines = wrapText(tmp, b, textW - 20);
+            totalH += lines.length * (lineH - 2) + 6;
+          });
+          totalH += 10;
+          return;
+        }
+        if (item.type === 'table') {
+          totalH += item.rows.length * 28 + 20;
+          return;
+        }
+      });
+      totalH += pad;
+
+      canvas.width = w * dpr;
+      canvas.height = totalH * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      // Background
+      ctx.fillStyle = '#ede8df';
+      ctx.beginPath();
+      ctx.roundRect(0, 0, w, totalH, 3);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.roundRect(0.5, 0.5, w - 1, totalH - 1, 3);
+      ctx.stroke();
+
+      const textColor = '#4a4540';
+
+      function letterpress(text, x, y) {
+        ctx.shadowColor = 'rgba(0,0,0,0.15)';
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = -0.5;
+        ctx.shadowBlur = 0.5;
+        ctx.fillText(text, x, y);
+        ctx.shadowColor = 'rgba(255,255,255,0.6)';
+        ctx.shadowOffsetY = 1;
+        ctx.shadowBlur = 0;
+        ctx.fillText(text, x, y);
+        ctx.shadowColor = 'transparent';
+      }
+
+      // --- Title ---
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = '#3a3632';
+      ctx.font = `400 18px ${SC}`;
+      ctx.letterSpacing = '4px';
+      letterpress('Praxis Project Proposal', w / 2, pad);
+
+      ctx.font = `300 12px ${SANS}`;
+      ctx.letterSpacing = '0.5px';
+      ctx.fillStyle = textColor;
+      letterpress('Secure and Privacy-Aware Digital Provenance Across Layered Ownership Systems', w / 2, pad + 28);
+
+      // Rule
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(pad, pad + 52);
+      ctx.lineTo(w - pad, pad + 52);
+      ctx.stroke();
+
+      ctx.font = `400 12px ${SC}`;
+      ctx.letterSpacing = '1.5px';
+      ctx.fillStyle = '#3a3632';
+      ctx.textAlign = 'left';
+      letterpress('Brian Richter  ·  Aviary Tech  ·  University of Victoria  ·  April 2026', pad, pad + 62);
+
+      // --- Render content ---
+      let curY = pad + 90;
+      ctx.textAlign = 'left';
+
+      content.forEach(item => {
+        if (item.type === 'spacer') { curY += 15; return; }
+
+        if (item.type === 'heading') {
+          ctx.fillStyle = '#3a3632';
+          ctx.font = `400 15px ${SC}`;
+          ctx.letterSpacing = '2px';
+          letterpress(item.text, pad, curY);
+          curY += 35;
+          return;
+        }
+
+        if (item.type === 'subheading') {
+          ctx.fillStyle = '#4a4540';
+          ctx.font = `400 13px ${SC}`;
+          ctx.letterSpacing = '1.5px';
+          letterpress(item.text, pad, curY);
+          curY += 28;
+          return;
+        }
+
+        if (item.type === 'para') {
+          ctx.fillStyle = textColor;
+          ctx.font = `300 14px ${SANS}`;
+          ctx.letterSpacing = '0.2px';
+          const lines = wrapText(ctx, item.text, textW);
+          lines.forEach(line => {
+            letterpress(line, pad, curY);
+            curY += lineH;
+          });
+          curY += 10;
+          return;
+        }
+
+        if (item.type === 'bullets') {
+          ctx.fillStyle = textColor;
+          ctx.font = `300 13px ${SANS}`;
+          ctx.letterSpacing = '0.2px';
+          item.items.forEach(b => {
+            const lines = wrapText(ctx, b, textW - 20);
+            lines.forEach((line, i) => {
+              if (i === 0) {
+                letterpress('—', pad + 4, curY);
+              }
+              letterpress(line, pad + 20, curY);
+              curY += lineH - 2;
+            });
+            curY += 6;
+          });
+          curY += 10;
+          return;
+        }
+
+        if (item.type === 'table') {
+          const col1 = pad;
+          const col2 = pad + 90;
+          const col3 = pad + 260;
+          ctx.font = `300 12px ${SANS}`;
+          ctx.letterSpacing = '0.2px';
+          ctx.fillStyle = textColor;
+
+          // Header line
+          ctx.strokeStyle = 'rgba(160, 150, 135, 0.25)';
+          ctx.beginPath();
+          ctx.moveTo(pad, curY - 4);
+          ctx.lineTo(w - pad, curY - 4);
+          ctx.stroke();
+
+          item.rows.forEach(row => {
+            letterpress(row[0], col1, curY);
+            letterpress(row[1], col2, curY);
+            letterpress(row[2], col3, curY);
+            curY += 28;
+          });
+
+          ctx.beginPath();
+          ctx.moveTo(pad, curY - 12);
+          ctx.lineTo(w - pad, curY - 12);
+          ctx.stroke();
+          curY += 20;
+          return;
+        }
+      });
+    }
+
     document.fonts.ready.then(() => {
       CARDS.forEach(card => drawCard(card.id, card));
       drawBrief();
+      drawProposal();
 
       // Set initial positions
       document.getElementById('card1wrapper').classList.add('front');
