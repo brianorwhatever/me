@@ -160,77 +160,87 @@
       ctx.roundRect(0.5, 0.5, w - 1, h - 1, 3);
       ctx.stroke();
 
-      // Letterpress emboss — subtle white below each glyph
-      ctx.shadowColor = 'rgba(255,255,255,0.45)';
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0.5;
-      ctx.shadowBlur = 0;
+      const textColor = '#4a4540';
+      const nameColor = '#3a3632';
 
-      const textColor = '#3a3632';
+      // Letterpress helper — draws text with indented/debossed look
+      // Dark shadow slightly above (pressed in), light highlight below (catch light)
+      function letterpress(text, x, y) {
+        // Dark inset shadow (top edge of pressed letter)
+        ctx.shadowColor = 'rgba(0,0,0,0.15)';
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = -0.5;
+        ctx.shadowBlur = 0.5;
+        ctx.fillText(text, x, y);
 
-      // --- Top-left: email (where phone goes in film) ---
+        // Light highlight (bottom edge catch light)
+        ctx.shadowColor = 'rgba(255,255,255,0.6)';
+        ctx.shadowOffsetY = 1;
+        ctx.shadowBlur = 0;
+        ctx.fillText(text, x, y);
+
+        ctx.shadowColor = 'transparent';
+      }
+
+      // --- Top-left: email ---
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
       ctx.fillStyle = textColor;
-      ctx.font = `300 15px ${SC}`;
+      ctx.font = `300 16px ${SC}`;
       ctx.letterSpacing = '1px';
-      ctx.fillText(data.email, pad, pad);
+      letterpress(data.email, pad, pad);
 
       // --- Top-right: company ---
       ctx.textAlign = 'right';
       ctx.fillStyle = textColor;
-      ctx.font = `400 16px ${SC}`;
+      ctx.font = `400 17px ${SC}`;
       ctx.letterSpacing = '1.5px';
-      ctx.fillText(data.companyLine1, w - pad, pad);
+      letterpress(data.companyLine1, w - pad, pad);
 
       // --- Center: Name ---
-      // First name in Cormorant SC (small caps), last name in Cormorant regular UPPERCASE (full caps)
       ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#2c2824';
+      ctx.fillStyle = nameColor;
       const nameY = h * 0.46;
 
       // Measure first name — small caps via Cormorant SC
-      ctx.font = `400 19px ${SC}`;
-      ctx.letterSpacing = '2.5px';
+      ctx.font = `400 22px ${SC}`;
+      ctx.letterSpacing = '3px';
       const firstW = ctx.measureText(data.firstName).width;
 
       // Measure last name — full caps via regular Cormorant
-      ctx.font = `400 23px ${REG}`;
-      ctx.letterSpacing = '3.5px';
+      ctx.font = `400 27px ${REG}`;
+      ctx.letterSpacing = '4px';
       const lastW = ctx.measureText(data.lastName).width;
 
-      const gap = 8;
+      const gap = 9;
       const totalW = firstW + gap + lastW;
       const startX = (w - totalW) / 2;
 
       // Draw first name — small caps
       ctx.textAlign = 'left';
-      ctx.font = `400 19px ${SC}`;
-      ctx.letterSpacing = '2.5px';
-      ctx.fillText(data.firstName, startX, nameY);
+      ctx.fillStyle = nameColor;
+      ctx.font = `400 22px ${SC}`;
+      ctx.letterSpacing = '3px';
+      letterpress(data.firstName, startX, nameY);
 
-      // Draw last name — full caps (regular font, uppercase string)
-      ctx.font = `400 23px ${REG}`;
-      ctx.letterSpacing = '3.5px';
-      ctx.fillText(data.lastName, startX + firstW + gap, nameY);
+      // Draw last name — full caps
+      ctx.fillStyle = nameColor;
+      ctx.font = `400 27px ${REG}`;
+      ctx.letterSpacing = '4px';
+      letterpress(data.lastName, startX + firstW + gap, nameY);
 
       // --- Title ---
       ctx.textAlign = 'center';
       ctx.fillStyle = textColor;
-      ctx.font = `300 15px ${SC}`;
+      ctx.font = `300 16px ${SC}`;
       ctx.letterSpacing = '2.5px';
-      ctx.fillText(data.title, w / 2, nameY + 32);
+      letterpress(data.title, w / 2, nameY + 35);
 
-      // --- Bottom line — spans edge to edge like address/fax/telex ---
-      ctx.shadowColor = 'transparent';
-      ctx.shadowColor = 'rgba(255,255,255,0.45)';
-      ctx.shadowOffsetY = 0.5;
-      ctx.fillStyle = '#4a4540';
-      ctx.font = `300 11px ${SC}`;
+      // --- Bottom line ---
+      ctx.fillStyle = '#5a5550';
+      ctx.font = `300 12px ${SC}`;
       ctx.letterSpacing = '0.8px';
-      ctx.fillText(data.bottomLine, w / 2, h - pad);
-
-      ctx.shadowColor = 'transparent';
+      letterpress(data.bottomLine, w / 2, h - pad);
     }
 
     document.fonts.ready.then(() => {
