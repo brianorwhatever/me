@@ -9,7 +9,7 @@
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after {
       margin: 0;
@@ -196,14 +196,14 @@
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
       ctx.fillStyle = '#3a3632';
-      ctx.font = '400 13px "Cormorant SC", serif';
+      ctx.font = '400 13px "EB Garamond", serif';
       ctx.letterSpacing = '1.5px';
       ctx.fillText(data.email, pad, pad);
 
       // --- Top-right: company name + division ---
       ctx.textAlign = 'right';
       ctx.fillStyle = '#3a3632';
-      ctx.font = '600 14.5px "Cormorant SC", serif';
+      ctx.font = '600 14.5px "EB Garamond", serif';
       ctx.letterSpacing = '2px';
       ctx.fillText(data.company, w - pad, pad);
 
@@ -214,11 +214,11 @@
       const nameY = h * 0.46;
 
       // Measure to position first + last together
-      ctx.font = '400 18px "Cormorant SC", serif';
+      ctx.font = '400 18px "EB Garamond", serif';
       ctx.letterSpacing = '3px';
       const firstW = ctx.measureText(data.firstName).width;
 
-      ctx.font = '600 24px "Cormorant SC", serif';
+      ctx.font = '600 24px "EB Garamond", serif';
       ctx.letterSpacing = '5px';
       const lastW = ctx.measureText(data.lastName).width;
 
@@ -229,19 +229,19 @@
       // Draw first name
       ctx.fillStyle = '#2c2824';
       ctx.textAlign = 'left';
-      ctx.font = '400 18px "Cormorant SC", serif';
+      ctx.font = '400 18px "EB Garamond", serif';
       ctx.letterSpacing = '3px';
       ctx.fillText(data.firstName, startX, nameY);
 
       // Draw last name
-      ctx.font = '600 24px "Cormorant SC", serif';
+      ctx.font = '600 24px "EB Garamond", serif';
       ctx.letterSpacing = '5px';
       ctx.fillText(data.lastName, startX + firstW + gap, nameY);
 
       // --- Title below name ---
       ctx.textAlign = 'center';
       ctx.fillStyle = '#3a3632';
-      ctx.font = '400 13px "Cormorant SC", serif';
+      ctx.font = '400 13px "EB Garamond", serif';
       ctx.letterSpacing = '2.5px';
       ctx.fillText(data.title, w / 2, nameY + 30);
 
@@ -250,7 +250,7 @@
       ctx.shadowColor = 'rgba(255,255,255,0.5)';
       ctx.shadowOffsetY = 0.5;
       ctx.fillStyle = '#4a4540';
-      ctx.font = '400 11px "Cormorant SC", serif';
+      ctx.font = '400 11px "EB Garamond", serif';
       ctx.letterSpacing = '1.5px';
       ctx.fillText(data.bottomLine, w / 2, h - pad);
 
