@@ -9,7 +9,7 @@
   <link rel="icon" href="data:,">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:wght@300;400;500;600;700&family=Cormorant+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after {
       margin: 0;
@@ -116,26 +116,25 @@
       {
         id: 'card1',
         firstName: 'Brian',
-        lastName: 'Richter',
+        lastName: 'RICHTER',
         title: 'Chief Executive Officer',
         companyLine1: 'Aviary Tech',
-        companyLine2: null,
         email: 'brian@aviary.tech',
-        bottomLine: '103 - 1208 Wharf St, Victoria BC V8W 3B9'
+        bottomLine: '103 - 1208 Wharf St, Victoria BC V8W 3B9  telegram @brianbrian51  discord brian51  x @brianorwhatever'
       },
       {
         id: 'card2',
         firstName: 'Brian',
-        lastName: 'Richter',
+        lastName: 'RICHTER',
         title: 'Software Engineer',
         companyLine1: 'Codex / Defined',
-        companyLine2: null,
         email: 'brian@defined.fi',
-        bottomLine: 'brian@defined.fi'
+        bottomLine: 'brian@defined.fi  telegram @brianbrian51  discord brian51  x @brianorwhatever'
       }
     ];
 
     const SC = '"Cormorant SC", serif';
+    const REG = '"Cormorant", serif';
 
     function drawCard(canvasId, data) {
       const canvas = document.getElementById(canvasId);
@@ -177,48 +176,41 @@
       ctx.letterSpacing = '1px';
       ctx.fillText(data.email, pad, pad);
 
-      // --- Top-right: company (like Pierce & Pierce) ---
+      // --- Top-right: company ---
       ctx.textAlign = 'right';
       ctx.fillStyle = textColor;
       ctx.font = `400 14px ${SC}`;
       ctx.letterSpacing = '1.5px';
       ctx.fillText(data.companyLine1, w - pad, pad);
-      if (data.companyLine2) {
-        ctx.font = `300 11px ${SC}`;
-        ctx.letterSpacing = '1.5px';
-        ctx.fillText(data.companyLine2, w - pad, pad + 18);
-      }
 
       // --- Center: Name ---
-      // Cormorant SC renders lowercase as small caps automatically
-      // so "Brian" → small caps, "Richter" at a larger size → larger small caps
-      ctx.textAlign = 'center';
+      // First name in Cormorant SC (small caps), last name in Cormorant regular UPPERCASE (full caps)
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#2c2824';
       const nameY = h * 0.46;
 
-      // Measure first name (small caps, smaller)
-      ctx.font = `400 15px ${SC}`;
+      // Measure first name — small caps via Cormorant SC
+      ctx.font = `400 16px ${SC}`;
       ctx.letterSpacing = '2px';
       const firstW = ctx.measureText(data.firstName).width;
 
-      // Measure last name (small caps, larger)
-      ctx.font = `400 19px ${SC}`;
+      // Measure last name — full caps via regular Cormorant
+      ctx.font = `400 19px ${REG}`;
       ctx.letterSpacing = '3px';
       const lastW = ctx.measureText(data.lastName).width;
 
-      const gap = 7;
+      const gap = 8;
       const totalW = firstW + gap + lastW;
       const startX = (w - totalW) / 2;
 
-      // Draw first name — small caps at smaller size
+      // Draw first name — small caps
       ctx.textAlign = 'left';
-      ctx.font = `400 15px ${SC}`;
+      ctx.font = `400 16px ${SC}`;
       ctx.letterSpacing = '2px';
       ctx.fillText(data.firstName, startX, nameY);
 
-      // Draw last name — small caps at larger size
-      ctx.font = `400 19px ${SC}`;
+      // Draw last name — full caps (regular font, uppercase string)
+      ctx.font = `400 19px ${REG}`;
       ctx.letterSpacing = '3px';
       ctx.fillText(data.lastName, startX + firstW + gap, nameY);
 
@@ -229,13 +221,13 @@
       ctx.letterSpacing = '2px';
       ctx.fillText(data.title, w / 2, nameY + 28);
 
-      // --- Bottom line ---
+      // --- Bottom line — spans edge to edge like address/fax/telex ---
       ctx.shadowColor = 'transparent';
       ctx.shadowColor = 'rgba(255,255,255,0.45)';
       ctx.shadowOffsetY = 0.5;
       ctx.fillStyle = '#4a4540';
-      ctx.font = `300 10.5px ${SC}`;
-      ctx.letterSpacing = '1px';
+      ctx.font = `300 9.5px ${SC}`;
+      ctx.letterSpacing = '0.8px';
       ctx.fillText(data.bottomLine, w / 2, h - pad);
 
       ctx.shadowColor = 'transparent';
