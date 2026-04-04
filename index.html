@@ -140,15 +140,16 @@
     }
 
     .brief-wrapper {
-      width: 800px;
+      width: 680px;
       border-radius: 4px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3);
+      aspect-ratio: 8.5 / 11;
     }
 
     .brief-wrapper canvas {
       display: block;
       width: 100%;
-      height: auto;
+      height: 100%;
       border-radius: 4px;
     }
 
@@ -161,7 +162,7 @@
       }
 
       .brief-wrapper {
-        width: 92vw;
+        width: 90vw;
       }
     }
   </style>
@@ -330,15 +331,11 @@
     function drawBrief() {
       const canvas = document.getElementById('brief');
       const dpr = window.devicePixelRatio || 1;
-      const w = 800;
-      const pad = 60;
+      const w = 680;
+      const h = Math.round(w * (11 / 8.5));
+      const pad = 55;
       const textW = w - pad * 2;
       const lineH = 26;
-
-      // Pre-measure height
-      const tmpCanvas = document.createElement('canvas');
-      tmpCanvas.width = w;
-      const tmpCtx = tmpCanvas.getContext('2d');
 
       const paragraphs = [
         'Brian Richter is the founder and chief executive officer of Aviary Tech, a company dedicated to Decentralized Identity. His work centers on the W3C standards for Decentralized Identifiers and Verifiable Credentials, building the infrastructure for digital identity that is self-sovereign, portable, and interoperable. The premise is simple: identity should not depend on any single platform or authority.',
@@ -347,24 +344,8 @@
         'A proposal for the Praxis project is forthcoming.'
       ];
 
-      // Calculate total height
-      tmpCtx.font = `400 15px ${REG}`;
-      tmpCtx.letterSpacing = '0.3px';
-      let totalLines = 0;
-      const wrappedParas = paragraphs.map(p => {
-        const lines = wrapText(tmpCtx, p, textW);
-        totalLines += lines.length;
-        return lines;
-      });
-
-      // Header area + paragraphs + gaps + padding
-      const headerH = 100;
-      const paraGap = lineH * 0.8;
-      const h = headerH + (totalLines * lineH) + ((paragraphs.length - 1) * paraGap) + pad + 20;
-
       canvas.width = w * dpr;
       canvas.height = h * dpr;
-      canvas.style.height = (h * (800 / w)) + 'px';
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
 
@@ -402,15 +383,15 @@
       ctx.fillStyle = '#3a3632';
       ctx.font = `400 20px ${SC}`;
       ctx.letterSpacing = '6px';
-      letterpress('Brief', pad + textW / 2, pad - 10);
+      letterpress('Brief', pad + textW / 2, pad);
 
       // Thin rule
       ctx.shadowColor = 'transparent';
       ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
       ctx.lineWidth = 0.5;
       ctx.beginPath();
-      ctx.moveTo(pad, pad + 22);
-      ctx.lineTo(w - pad, pad + 22);
+      ctx.moveTo(pad, pad + 32);
+      ctx.lineTo(w - pad, pad + 32);
       ctx.stroke();
 
       // RE: line
@@ -418,7 +399,7 @@
       ctx.fillStyle = '#3a3632';
       ctx.font = `400 14px ${SC}`;
       ctx.letterSpacing = '2px';
-      letterpress('re: Brian Richter', pad, pad + 34);
+      letterpress('re: Brian Richter', pad, pad + 46);
 
       // --- Body paragraphs ---
       ctx.font = `400 15px ${REG}`;
@@ -426,7 +407,9 @@
       ctx.fillStyle = textColor;
       ctx.textBaseline = 'top';
 
-      let curY = headerH;
+      const paraGap = lineH * 0.8;
+      const wrappedParas = paragraphs.map(p => wrapText(ctx, p, textW));
+      let curY = pad + 80;
 
       wrappedParas.forEach((lines, pIdx) => {
         lines.forEach(line => {
