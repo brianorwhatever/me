@@ -129,7 +129,7 @@
         title: 'Software Engineer',
         companyLine1: 'Codex / Defined',
         email: 'brian@defined.fi',
-        bottomLine: 'brian@defined.fi  telegram @brianbrian51  discord brian51  x @brianorwhatever'
+        bottomLine: 'brian@defined.fi  github brianorwhatever  telegram @brianbrian51  discord brian51  x @brianorwhatever'
       }
     ];
 
@@ -172,14 +172,14 @@
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
       ctx.fillStyle = textColor;
-      ctx.font = `300 13px ${SC}`;
+      ctx.font = `300 15px ${SC}`;
       ctx.letterSpacing = '1px';
       ctx.fillText(data.email, pad, pad);
 
       // --- Top-right: company ---
       ctx.textAlign = 'right';
       ctx.fillStyle = textColor;
-      ctx.font = `400 14px ${SC}`;
+      ctx.font = `400 16px ${SC}`;
       ctx.letterSpacing = '1.5px';
       ctx.fillText(data.companyLine1, w - pad, pad);
 
@@ -190,13 +190,13 @@
       const nameY = h * 0.46;
 
       // Measure first name — small caps via Cormorant SC
-      ctx.font = `400 16px ${SC}`;
-      ctx.letterSpacing = '2px';
+      ctx.font = `400 19px ${SC}`;
+      ctx.letterSpacing = '2.5px';
       const firstW = ctx.measureText(data.firstName).width;
 
       // Measure last name — full caps via regular Cormorant
-      ctx.font = `400 19px ${REG}`;
-      ctx.letterSpacing = '3px';
+      ctx.font = `400 23px ${REG}`;
+      ctx.letterSpacing = '3.5px';
       const lastW = ctx.measureText(data.lastName).width;
 
       const gap = 8;
@@ -205,28 +205,28 @@
 
       // Draw first name — small caps
       ctx.textAlign = 'left';
-      ctx.font = `400 16px ${SC}`;
-      ctx.letterSpacing = '2px';
+      ctx.font = `400 19px ${SC}`;
+      ctx.letterSpacing = '2.5px';
       ctx.fillText(data.firstName, startX, nameY);
 
       // Draw last name — full caps (regular font, uppercase string)
-      ctx.font = `400 19px ${REG}`;
-      ctx.letterSpacing = '3px';
+      ctx.font = `400 23px ${REG}`;
+      ctx.letterSpacing = '3.5px';
       ctx.fillText(data.lastName, startX + firstW + gap, nameY);
 
       // --- Title ---
       ctx.textAlign = 'center';
       ctx.fillStyle = textColor;
-      ctx.font = `300 13px ${SC}`;
-      ctx.letterSpacing = '2px';
-      ctx.fillText(data.title, w / 2, nameY + 28);
+      ctx.font = `300 15px ${SC}`;
+      ctx.letterSpacing = '2.5px';
+      ctx.fillText(data.title, w / 2, nameY + 32);
 
       // --- Bottom line — spans edge to edge like address/fax/telex ---
       ctx.shadowColor = 'transparent';
       ctx.shadowColor = 'rgba(255,255,255,0.45)';
       ctx.shadowOffsetY = 0.5;
       ctx.fillStyle = '#4a4540';
-      ctx.font = `300 9.5px ${SC}`;
+      ctx.font = `300 11px ${SC}`;
       ctx.letterSpacing = '0.8px';
       ctx.fillText(data.bottomLine, w / 2, h - pad);
 
