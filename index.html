@@ -150,73 +150,34 @@
       box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 3px 8px rgba(0,0,0,0.35);
     }
 
-    .doc-section {
-      width: 680px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .doc-stack {
+    .page-stack {
       position: relative;
       width: 680px;
-      height: 18px;
-      cursor: pointer;
-      transition: height 0.4s ease;
-    }
-
-    .doc-stack .edge {
-      position: absolute;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: #ede8df;
-      border-radius: 1px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-      transition: transform 0.4s ease, opacity 0.4s ease;
-    }
-
-    .doc-stack .edge:nth-child(1) { top: 0; }
-    .doc-stack .edge:nth-child(2) { top: 5px; left: 2px; width: calc(100% - 4px); }
-    .doc-stack .edge:nth-child(3) { top: 10px; left: 4px; width: calc(100% - 8px); }
-    .doc-stack .edge:nth-child(4) { top: 14px; left: 6px; width: calc(100% - 12px); opacity: 0.7; }
-
-    .doc-stack:hover .edge {
-      box-shadow: 0 1px 5px rgba(0,0,0,0.3);
-    }
-
-    .doc-stack:hover .edge:nth-child(1) { transform: translateY(-2px); }
-    .doc-stack:hover .edge:nth-child(2) { transform: translateY(-1px); }
-
-    .doc-section.open .doc-stack {
-      height: 0;
-      overflow: hidden;
-      opacity: 0;
-    }
-
-    .doc-pages {
-      display: flex;
-      flex-direction: column;
-      gap: 2vh;
-      width: 680px;
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.5s ease;
-    }
-
-    .doc-section.open .doc-pages {
-      max-height: 50000px;
-      opacity: 1;
-    }
-
-    .doc-pages canvas {
-      display: block;
-      width: 100%;
       aspect-ratio: 8.5 / 11;
+      cursor: pointer;
+    }
+
+    .page-stack canvas {
+      position: absolute;
+      width: 100%;
+      height: 100%;
       border-radius: 4px;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .page-stack canvas.page-back {
+      transform: translate(8px, 8px);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    .page-stack canvas.page-front {
+      transform: translate(-3px, -3px);
       box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3);
+    }
+
+    .page-stack canvas.page-front:hover {
+      box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 3px 8px rgba(0,0,0,0.35);
     }
 
     /* Responsive scaling */
@@ -227,9 +188,7 @@
         height: calc(90vw * 400 / 700);
       }
 
-      .doc-section,
-      .doc-stack,
-      .doc-pages {
+      .page-stack {
         width: 90vw;
       }
     }
@@ -244,24 +203,8 @@
       <canvas id="card1" width="700" height="400"></canvas>
     </div>
   </div>
-  <div class="doc-section" id="briefSection">
-    <div class="doc-stack" id="briefStack">
-      <div class="edge"></div>
-      <div class="edge"></div>
-      <div class="edge"></div>
-      <div class="edge"></div>
-    </div>
-    <div class="doc-pages" id="briefPages"></div>
-  </div>
-  <div class="doc-section" id="proposalSection">
-    <div class="doc-stack" id="proposalStack">
-      <div class="edge"></div>
-      <div class="edge"></div>
-      <div class="edge"></div>
-      <div class="edge"></div>
-    </div>
-    <div class="doc-pages" id="proposalPages"></div>
-  </div>
+  <div class="page-stack" id="briefStack"></div>
+  <div class="page-stack" id="proposalStack"></div>
   <script>
     const CARDS = [
       {
@@ -579,6 +522,36 @@
       });
     }
 
+    // Set up click-to-cycle on a page stack container
+    function setupPageStack(containerId) {
+      const container = document.getElementById(containerId);
+      const pages = Array.from(container.querySelectorAll('canvas'));
+      if (pages.length === 0) return;
+
+      let currentIdx = 0;
+
+      function updateStack() {
+        pages.forEach((page, i) => {
+          page.className = '';
+          if (i === currentIdx) {
+            page.classList.add('page-front');
+            page.style.zIndex = pages.length + 1;
+          } else {
+            page.classList.add('page-back');
+            // Stack behind pages with slight cascading offset
+            page.style.zIndex = i < currentIdx ? i : pages.length - Math.abs(i - currentIdx);
+          }
+        });
+      }
+
+      updateStack();
+
+      container.addEventListener('click', () => {
+        currentIdx = (currentIdx + 1) % pages.length;
+        updateStack();
+      });
+    }
+
     // --- Brief ---
     function drawBrief() {
       const briefContent = [
@@ -588,7 +561,7 @@
         { type: 'para', text: 'He is currently preparing a Praxis project proposal for the University of Victoria Doctor of Engineering program, also known as LEAP: Leadership in Engineering Applications and Practice. The DEng is Canada\'s first professional doctorate in engineering, designed for senior practitioners conducting applied research. Details are forthcoming.' }
       ];
 
-      renderDocument('briefPages', (ctx, startY) => {
+      renderDocument('briefStack', (ctx, startY) => {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#3a3632';
@@ -677,7 +650,7 @@
         { type: 'para', text: 'The strongest outcome is not merely a new application. It is a reusable architecture, implementation, and evidence base whose value does not depend on a specific commercial context.' },
       ];
 
-      renderDocument('proposalPages', (ctx, startY) => {
+      renderDocument('proposalStack', (ctx, startY) => {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#3a3632';
@@ -708,22 +681,14 @@
       }, proposalContent);
     }
 
-    let briefDrawn = false;
-    let proposalDrawn = false;
-
     document.fonts.ready.then(() => {
       CARDS.forEach(card => drawCard(card.id, card));
 
-      // Stack click handlers — lazy render on first open
-      document.getElementById('briefStack').addEventListener('click', () => {
-        if (!briefDrawn) { drawBrief(); briefDrawn = true; }
-        document.getElementById('briefSection').classList.toggle('open');
-      });
-
-      document.getElementById('proposalStack').addEventListener('click', () => {
-        if (!proposalDrawn) { drawProposal(); proposalDrawn = true; }
-        document.getElementById('proposalSection').classList.toggle('open');
-      });
+      // Render and set up page stacks
+      drawBrief();
+      setupPageStack('briefStack');
+      drawProposal();
+      setupPageStack('proposalStack');
 
       // Set initial positions
       document.getElementById('card1wrapper').classList.add('front');
