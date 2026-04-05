@@ -157,22 +157,41 @@
       align-items: center;
     }
 
-    .doc-tab {
+    .doc-stack {
+      position: relative;
+      width: 680px;
+      height: 18px;
       cursor: pointer;
-      padding: 12px 32px;
-      border: 1px solid rgba(180, 170, 155, 0.25);
-      border-radius: 2px;
-      background: rgba(237, 232, 223, 0.06);
-      transition: all 0.3s ease;
+      transition: height 0.4s ease;
     }
 
-    .doc-tab:hover {
-      background: rgba(237, 232, 223, 0.12);
-      border-color: rgba(180, 170, 155, 0.4);
+    .doc-stack .edge {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: #ede8df;
+      border-radius: 1px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: transform 0.4s ease, opacity 0.4s ease;
     }
 
-    .doc-tab canvas {
-      display: block;
+    .doc-stack .edge:nth-child(1) { top: 0; }
+    .doc-stack .edge:nth-child(2) { top: 5px; left: 2px; width: calc(100% - 4px); }
+    .doc-stack .edge:nth-child(3) { top: 10px; left: 4px; width: calc(100% - 8px); }
+    .doc-stack .edge:nth-child(4) { top: 14px; left: 6px; width: calc(100% - 12px); opacity: 0.7; }
+
+    .doc-stack:hover .edge {
+      box-shadow: 0 1px 5px rgba(0,0,0,0.3);
+    }
+
+    .doc-stack:hover .edge:nth-child(1) { transform: translateY(-2px); }
+    .doc-stack:hover .edge:nth-child(2) { transform: translateY(-1px); }
+
+    .doc-section.open .doc-stack {
+      height: 0;
+      overflow: hidden;
+      opacity: 0;
     }
 
     .doc-pages {
@@ -184,15 +203,12 @@
       max-height: 0;
       opacity: 0;
       transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.4s ease,
-                  margin-top 0.4s ease;
-      margin-top: 0;
+                  opacity 0.5s ease;
     }
 
-    .doc-pages.open {
+    .doc-section.open .doc-pages {
       max-height: 50000px;
       opacity: 1;
-      margin-top: 2vh;
     }
 
     .doc-pages canvas {
@@ -211,14 +227,8 @@
         height: calc(90vw * 400 / 700);
       }
 
-      .doc-section {
-        width: 90vw;
-      }
-
-      .doc-tab {
-        width: 70vw;
-      }
-
+      .doc-section,
+      .doc-stack,
       .doc-pages {
         width: 90vw;
       }
@@ -234,15 +244,21 @@
       <canvas id="card1" width="700" height="400"></canvas>
     </div>
   </div>
-  <div class="doc-section">
-    <div class="doc-tab" id="briefTabWrap">
-      <canvas id="briefTab" width="200" height="24"></canvas>
+  <div class="doc-section" id="briefSection">
+    <div class="doc-stack" id="briefStack">
+      <div class="edge"></div>
+      <div class="edge"></div>
+      <div class="edge"></div>
+      <div class="edge"></div>
     </div>
     <div class="doc-pages" id="briefPages"></div>
   </div>
-  <div class="doc-section">
-    <div class="doc-tab" id="proposalTabWrap">
-      <canvas id="proposalTab" width="340" height="24"></canvas>
+  <div class="doc-section" id="proposalSection">
+    <div class="doc-stack" id="proposalStack">
+      <div class="edge"></div>
+      <div class="edge"></div>
+      <div class="edge"></div>
+      <div class="edge"></div>
     </div>
     <div class="doc-pages" id="proposalPages"></div>
   </div>
@@ -692,41 +708,21 @@
       }, proposalContent);
     }
 
-    function drawTab(canvasId, title, canvasW) {
-      const canvas = document.getElementById(canvasId);
-      const dpr = window.devicePixelRatio || 1;
-      const w = canvasW || 200;
-      const h = 24;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
-
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = 'rgba(200, 190, 175, 0.8)';
-      ctx.font = `400 13px ${SC}`;
-      ctx.letterSpacing = '3px';
-      ctx.fillText(title, w / 2, h / 2);
-    }
-
     let briefDrawn = false;
     let proposalDrawn = false;
 
     document.fonts.ready.then(() => {
       CARDS.forEach(card => drawCard(card.id, card));
-      drawTab('briefTab', 'Brief', 200);
-      drawTab('proposalTab', 'Praxis Project Proposal', 340);
 
-      // Tab click handlers — lazy render on first open
-      document.getElementById('briefTabWrap').addEventListener('click', () => {
+      // Stack click handlers — lazy render on first open
+      document.getElementById('briefStack').addEventListener('click', () => {
         if (!briefDrawn) { drawBrief(); briefDrawn = true; }
-        document.getElementById('briefPages').classList.toggle('open');
+        document.getElementById('briefSection').classList.toggle('open');
       });
 
-      document.getElementById('proposalTabWrap').addEventListener('click', () => {
+      document.getElementById('proposalStack').addEventListener('click', () => {
         if (!proposalDrawn) { drawProposal(); proposalDrawn = true; }
-        document.getElementById('proposalPages').classList.toggle('open');
+        document.getElementById('proposalSection').classList.toggle('open');
       });
 
       // Set initial positions
