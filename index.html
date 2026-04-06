@@ -63,62 +63,19 @@
           rgba(70,50,30,0.08) 0%,
           transparent 70%
         );
-      overflow-x: hidden;
+      overflow: hidden;
       user-select: none;
       -webkit-user-select: none;
-      flex-direction: column;
-      padding: 15vh 0;
-      gap: 15vh;
     }
 
-    .card-stack {
-      position: relative;
-      width: 700px;
-      height: 400px;
-      cursor: pointer;
-    }
-
-    .card-wrapper {
-      position: absolute;
-      width: 700px;
-      height: 400px;
-      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-                  box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);
-    }
-
-    .card-wrapper canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border-radius: 4px;
-    }
-
-    /* Back card offset */
-    .card-wrapper.back {
-      transform: translate(12px, 12px);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
-    }
-
-    /* Front card */
-    .card-wrapper.front {
-      transform: translate(-4px, -4px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3);
-    }
-
-    .card-wrapper.front:hover {
-      box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 3px 8px rgba(0,0,0,0.35);
-    }
-
-    .page-stack {
+    .mega-stack {
       position: relative;
       width: 680px;
       aspect-ratio: 8.5 / 11;
       cursor: pointer;
     }
 
-    .page-stack canvas {
+    .mega-stack canvas {
       position: absolute;
       width: 100%;
       height: 100%;
@@ -127,64 +84,30 @@
                   box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .page-stack canvas.page-back {
+    .mega-stack canvas.page-back {
       transform: translate(8px, 8px);
       box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
 
-    .page-stack canvas.page-front {
+    .mega-stack canvas.page-front {
       transform: translate(-3px, -3px);
       box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.3);
     }
 
-    .page-stack canvas.page-front:hover {
+    .mega-stack canvas.page-front:hover {
       box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 3px 8px rgba(0,0,0,0.35);
-    }
-
-    .doc-icon {
-      cursor: pointer;
-      transition: transform 0.3s ease;
-      width: 500px;
-    }
-
-    .doc-icon:hover {
-      transform: scale(1.03);
-    }
-
-    .doc-icon canvas {
-      display: block;
-      width: 100%;
-      height: auto;
     }
 
     /* Responsive scaling */
     @media (max-width: 860px) {
-      .card-stack,
-      .card-wrapper {
-        width: 90vw;
-        height: calc(90vw * 400 / 700);
-      }
-
-      .page-stack {
-        width: 90vw;
+      .mega-stack {
+        width: 92vw;
       }
     }
   </style>
 </head>
 <body>
-  <div class="card-stack" id="cardStack">
-    <div class="card-wrapper" id="card2wrapper" data-card="2">
-      <canvas id="card2" width="700" height="400"></canvas>
-    </div>
-    <div class="card-wrapper" id="card1wrapper" data-card="1">
-      <canvas id="card1" width="700" height="400"></canvas>
-    </div>
-  </div>
-  <div class="page-stack" id="briefStack"></div>
-  <div class="doc-icon" id="proposalIcon">
-    <canvas id="proposalIconCanvas" width="500" height="420"></canvas>
-  </div>
-  <div class="page-stack" id="proposalStack" style="display:none;"></div>
+  <div class="mega-stack" id="megaStack"></div>
   <script>
     // Load fonts via FontFace API for reliable canvas rendering
     const fontData = [
@@ -224,29 +147,31 @@
     const SC = '"Cormorant SC", serif';
     const REG = '"Cormorant", serif';
 
-    function drawCard(canvasId, data) {
-      const canvas = document.getElementById(canvasId);
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = 700 * dpr;
-      canvas.height = 400 * dpr;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
-      const w = 700;
-      const h = 400;
-      const pad = 42;
+    function drawCardOnPage(container, data) {
+      const ctx = createPage(container);
+      const cardW = 560;
+      const cardH = 320;
+      const cx = (PAGE_W - cardW) / 2;
+      const cy = (PAGE_H - cardH) / 2;
+      const w = cardW;
+      const h = cardH;
+      const pad = 36;
 
-      // Card background — warm bone/cream
-      ctx.fillStyle = '#ede8df';
+      // Card rectangle on the page
+      ctx.fillStyle = '#f5f0e8';
       ctx.beginPath();
-      ctx.roundRect(0, 0, w, h, 3);
+      ctx.roundRect(cx, cy, w, h, 3);
       ctx.fill();
 
-      // Very subtle edge
-      ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.25)';
       ctx.lineWidth = 0.5;
       ctx.beginPath();
-      ctx.roundRect(0.5, 0.5, w - 1, h - 1, 3);
+      ctx.roundRect(cx + 0.5, cy + 0.5, w - 1, h - 1, 3);
       ctx.stroke();
+
+      // Offset all drawing by card position
+      ctx.save();
+      ctx.translate(cx, cy);
 
       const textColor = '#4a4540';
       const nameColor = '#3a3632';
@@ -329,6 +254,8 @@
       ctx.font = `300 12px ${SC}`;
       ctx.letterSpacing = '0.8px';
       letterpress(data.bottomLine, w / 2, h - pad);
+
+      ctx.restore();
     }
 
     function wrapText(ctx, text, maxWidth) {
@@ -555,7 +482,7 @@
         { type: 'para', text: 'He is currently preparing a Praxis project proposal for the University of Victoria Doctor of Engineering program, also known as LEAP: Leadership in Engineering Applications and Practice. The DEng is Canada\'s first professional doctorate in engineering, designed for senior practitioners conducting applied research. Details are forthcoming.' }
       ];
 
-      renderDocument('briefStack', (ctx, startY) => {
+      renderDocument('megaStack', (ctx, startY) => {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#3a3632';
@@ -644,7 +571,7 @@
         { type: 'para', text: 'The strongest outcome is not merely a new application. It is a reusable architecture, implementation, and evidence base whose value does not depend on a specific commercial context.' },
       ];
 
-      renderDocument('proposalStack', (ctx, startY) => {
+      renderDocument('megaStack', (ctx, startY) => {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#3a3632';
@@ -675,129 +602,22 @@
       }, proposalContent);
     }
 
-    function drawProposalIcon() {
-      const canvas = document.getElementById('proposalIconCanvas');
-      const dpr = window.devicePixelRatio || 1;
-      const w = 500;
-      const h = 420;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
-
-      const cx = w / 2;
-      const cy = 180;
-      const pageW = 170;
-      const pageH = 220;
-
-      // Scattered pile of pages — each with slight random offset and rotation
-      const pages = [
-        { angle: -12, dx: -30, dy: 15 },
-        { angle: 8,   dx: 25,  dy: 10 },
-        { angle: -4,  dx: -10, dy: -5 },
-        { angle: 15,  dx: 20,  dy: -8 },
-        { angle: -7,  dx: -18, dy: 5 },
-        { angle: 2,   dx: 5,   dy: -2 },
-        { angle: -1,  dx: -3,  dy: 0 },
-      ];
-
-      pages.forEach((p, idx) => {
-        ctx.save();
-        ctx.translate(cx + p.dx, cy + p.dy);
-        ctx.rotate(p.angle * Math.PI / 180);
-
-        // Page shadow
-        ctx.shadowColor = 'rgba(0,0,0,0.12)';
-        ctx.shadowOffsetX = 2;
-        ctx.shadowOffsetY = 3;
-        ctx.shadowBlur = 6;
-
-        // Page
-        ctx.fillStyle = idx === pages.length - 1 ? '#ede8df' : '#f0ebe3';
-        ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.rect(-pageW / 2, -pageH / 2, pageW, pageH);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.shadowColor = 'transparent';
-
-        // Text lines on top pages
-        if (idx >= pages.length - 3) {
-          const lineColor = 'rgba(58, 54, 50, 0.1)';
-          ctx.fillStyle = lineColor;
-          const numLines = idx === pages.length - 1 ? 10 : 7;
-          for (let i = 0; i < numLines; i++) {
-            const lw = i === 0 ? pageW * 0.45 : (pageW * 0.3 + Math.random() * pageW * 0.35);
-            ctx.fillRect(-pageW / 2 + 18, -pageH / 2 + 22 + i * 16, lw, 3);
-          }
-        }
-
-        ctx.restore();
-      });
-
-      // Label below pile
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      ctx.fillStyle = 'rgba(200, 190, 175, 0.85)';
-      ctx.font = `400 15px ${SC}`;
-      ctx.letterSpacing = '4px';
-      ctx.fillText('Praxis Proposal', cx, cy + pageH / 2 + 24);
-    }
-
     // Explicitly load all fonts — document.fonts.ready won't trigger for
     // fonts only used on canvas since no DOM elements reference them
     Promise.all(fontPromises).then(() => {
-      CARDS.forEach(card => drawCard(card.id, card));
+      const stack = document.getElementById('megaStack');
 
-      // Render page stacks
+      // 1. Business cards on letter-size pages
+      CARDS.forEach(card => drawCardOnPage(stack, card));
+
+      // 2. Brief pages
       drawBrief();
-      setupPageStack('briefStack');
 
-      // Draw proposal icon — click to reveal proposal
-      drawProposalIcon();
-      let proposalRevealed = false;
-      document.getElementById('proposalIcon').addEventListener('click', () => {
-        if (!proposalRevealed) {
-          drawProposal();
-          setupPageStack('proposalStack');
-          proposalRevealed = true;
-        }
-        document.getElementById('proposalIcon').style.display = 'none';
-        document.getElementById('proposalStack').style.display = '';
-      });
+      // 3. Proposal pages
+      drawProposal();
 
-      // Set initial positions
-      document.getElementById('card1wrapper').classList.add('front');
-      document.getElementById('card2wrapper').classList.add('back');
-
-      document.getElementById('card1wrapper').style.zIndex = '2';
-      document.getElementById('card2wrapper').style.zIndex = '1';
-
-      let card1Front = true;
-
-      document.getElementById('cardStack').addEventListener('click', (e) => {
-        // Don't swap if clicking the email link
-        if (e.target.closest('.email-link')) return;
-
-        const wrapper1 = document.getElementById('card1wrapper');
-        const wrapper2 = document.getElementById('card2wrapper');
-
-        card1Front = !card1Front;
-
-        if (card1Front) {
-          wrapper1.classList.replace('back', 'front');
-          wrapper2.classList.replace('front', 'back');
-          wrapper1.style.zIndex = '2';
-          wrapper2.style.zIndex = '1';
-        } else {
-          wrapper1.classList.replace('front', 'back');
-          wrapper2.classList.replace('back', 'front');
-          wrapper1.style.zIndex = '1';
-          wrapper2.style.zIndex = '2';
-        }
-      });
+      // One unified click-to-cycle
+      setupPageStack('megaStack');
     });
   </script>
 </body>
