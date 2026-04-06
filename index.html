@@ -108,6 +108,12 @@
     .link-overlay a {
       position: absolute;
       cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.2s ease;
+    }
+
+    .link-overlay a:hover {
+      background: rgba(0, 0, 0, 0.06);
     }
 
     .cta {
@@ -531,7 +537,14 @@
           a.style.left = link.left;
           a.style.width = link.width;
           a.style.height = link.height;
-          a.addEventListener('click', (e) => e.stopPropagation());
+          a.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (link.action === 'goToLast') {
+              e.preventDefault();
+              currentIdx = pages.length - 1;
+              updateStack();
+            }
+          });
           overlay.appendChild(a);
         });
       }
@@ -755,7 +768,8 @@
         const idx = pageCount();
         drawCardOnPage(stack, card);
         registerLinks(idx, [
-          { href: 'mailto:' + card.email, top: '8%', left: '4%', width: '35%', height: '12%' },
+          { href: 'mailto:' + card.email, top: '8%', left: '4%', width: '35%', height: '10%' },
+          { href: '#connect', action: 'goToLast', top: '85%', left: '5%', width: '90%', height: '10%' },
         ]);
       });
 
