@@ -172,10 +172,14 @@
     const SC = '"Cormorant SC", serif';
     const REG = '"Cormorant", serif';
 
+    const isMobile = window.innerWidth < 600;
+
     function drawCardOnPage(container, data) {
       const dpr = window.devicePixelRatio || 1;
       const w = 680;
-      const h = 388;
+      const h = isMobile ? 680 : 388;
+      const s = isMobile ? 1.5 : 1;
+      const pad = isMobile ? 50 : 42;
       const canvas = document.createElement('canvas');
       canvas.width = w * dpr;
       canvas.height = h * dpr;
@@ -183,102 +187,134 @@
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
 
-      // Card background — fills the canvas
       ctx.fillStyle = '#ede8df';
       ctx.beginPath();
       ctx.roundRect(0, 0, w, h, 3);
       ctx.fill();
-
       ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
       ctx.lineWidth = 0.5;
       ctx.beginPath();
       ctx.roundRect(0.5, 0.5, w - 1, h - 1, 3);
       ctx.stroke();
 
-      const pad = 42;
-
       const textColor = '#4a4540';
       const nameColor = '#3a3632';
 
-      // Letterpress helper — draws text with indented/debossed look
-      // Dark shadow slightly above (pressed in), light highlight below (catch light)
-      function letterpress(text, x, y) {
-        // Dark inset shadow (top edge of pressed letter)
+      function lp(text, x, y) {
         ctx.shadowColor = 'rgba(0,0,0,0.15)';
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = -0.5;
         ctx.shadowBlur = 0.5;
         ctx.fillText(text, x, y);
-
-        // Light highlight (bottom edge catch light)
         ctx.shadowColor = 'rgba(255,255,255,0.6)';
         ctx.shadowOffsetY = 1;
         ctx.shadowBlur = 0;
         ctx.fillText(text, x, y);
-
         ctx.shadowColor = 'transparent';
       }
 
-      // --- Top-left: email ---
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.fillStyle = textColor;
-      ctx.font = `300 16px ${SC}`;
-      ctx.letterSpacing = '1px';
-      letterpress(data.email, pad, pad);
+      if (isMobile) {
+        // Portrait layout — stacked vertically, centered
+        const cx = w / 2;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
 
-      // --- Top-right: company ---
-      ctx.textAlign = 'right';
-      ctx.fillStyle = textColor;
-      ctx.font = `400 17px ${SC}`;
-      ctx.letterSpacing = '1.5px';
-      letterpress(data.companyLine1, w - pad, pad);
+        // Company
+        ctx.fillStyle = textColor;
+        ctx.font = `400 ${20 * s}px ${SC}`;
+        ctx.letterSpacing = '2px';
+        lp(data.companyLine1, cx, pad + 20);
 
-      // --- Center: Name ---
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = nameColor;
-      const nameY = h * 0.46;
+        // Name
+        const nameY = h * 0.38;
+        ctx.font = `400 ${16 * s}px ${SC}`;
+        ctx.letterSpacing = '2.5px';
+        const fW = ctx.measureText(data.firstName).width;
+        ctx.font = `400 ${20 * s}px ${REG}`;
+        ctx.letterSpacing = '3.5px';
+        const lW = ctx.measureText(data.lastName).width;
+        const g = 10;
+        const sx = (w - fW - g - lW) / 2;
 
-      // Measure first name — small caps via Cormorant SC
-      ctx.font = `400 22px ${SC}`;
-      ctx.letterSpacing = '3px';
-      const firstW = ctx.measureText(data.firstName).width;
+        ctx.textAlign = 'left';
+        ctx.fillStyle = nameColor;
+        ctx.font = `400 ${16 * s}px ${SC}`;
+        ctx.letterSpacing = '2.5px';
+        lp(data.firstName, sx, nameY);
+        ctx.font = `400 ${20 * s}px ${REG}`;
+        ctx.letterSpacing = '3.5px';
+        lp(data.lastName, sx + fW + g, nameY);
 
-      // Measure last name — full caps via regular Cormorant
-      ctx.font = `400 27px ${REG}`;
-      ctx.letterSpacing = '4px';
-      const lastW = ctx.measureText(data.lastName).width;
+        // Title
+        ctx.textAlign = 'center';
+        ctx.fillStyle = textColor;
+        ctx.font = `300 ${14 * s}px ${SC}`;
+        ctx.letterSpacing = '3px';
+        lp(data.title, cx, nameY + 50);
 
-      const gap = 9;
-      const totalW = firstW + gap + lastW;
-      const startX = (w - totalW) / 2;
+        // Email
+        ctx.fillStyle = textColor;
+        ctx.font = `300 ${13 * s}px ${SC}`;
+        ctx.letterSpacing = '1px';
+        lp(data.email, cx, nameY + 100);
 
-      // Draw first name — small caps
-      ctx.textAlign = 'left';
-      ctx.fillStyle = nameColor;
-      ctx.font = `400 22px ${SC}`;
-      ctx.letterSpacing = '3px';
-      letterpress(data.firstName, startX, nameY);
+        // Bottom — split into two lines
+        ctx.fillStyle = '#5a5550';
+        ctx.font = `300 ${10 * s}px ${SC}`;
+        ctx.letterSpacing = '0.8px';
+        const parts = data.bottomLine.split('  ');
+        const mid = Math.ceil(parts.length / 2);
+        lp(parts.slice(0, mid).join('  '), cx, h - pad - 22);
+        lp(parts.slice(mid).join('  '), cx, h - pad);
+      } else {
+        // Landscape layout — original design
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = textColor;
+        ctx.font = `300 16px ${SC}`;
+        ctx.letterSpacing = '1px';
+        lp(data.email, pad, pad);
 
-      // Draw last name — full caps
-      ctx.fillStyle = nameColor;
-      ctx.font = `400 27px ${REG}`;
-      ctx.letterSpacing = '4px';
-      letterpress(data.lastName, startX + firstW + gap, nameY);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = textColor;
+        ctx.font = `400 17px ${SC}`;
+        ctx.letterSpacing = '1.5px';
+        lp(data.companyLine1, w - pad, pad);
 
-      // --- Title ---
-      ctx.textAlign = 'center';
-      ctx.fillStyle = textColor;
-      ctx.font = `300 16px ${SC}`;
-      ctx.letterSpacing = '2.5px';
-      letterpress(data.title, w / 2, nameY + 35);
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = nameColor;
+        const nameY = h * 0.46;
 
-      // --- Bottom line ---
-      ctx.fillStyle = '#5a5550';
-      ctx.font = `300 12px ${SC}`;
-      ctx.letterSpacing = '0.8px';
-      letterpress(data.bottomLine, w / 2, h - pad);
+        ctx.font = `400 22px ${SC}`;
+        ctx.letterSpacing = '3px';
+        const firstW = ctx.measureText(data.firstName).width;
+        ctx.font = `400 27px ${REG}`;
+        ctx.letterSpacing = '4px';
+        const lastW = ctx.measureText(data.lastName).width;
+        const gap = 9;
+        const startX = (w - firstW - gap - lastW) / 2;
 
+        ctx.textAlign = 'left';
+        ctx.fillStyle = nameColor;
+        ctx.font = `400 22px ${SC}`;
+        ctx.letterSpacing = '3px';
+        lp(data.firstName, startX, nameY);
+        ctx.fillStyle = nameColor;
+        ctx.font = `400 27px ${REG}`;
+        ctx.letterSpacing = '4px';
+        lp(data.lastName, startX + firstW + gap, nameY);
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = textColor;
+        ctx.font = `300 16px ${SC}`;
+        ctx.letterSpacing = '2.5px';
+        lp(data.title, w / 2, nameY + 35);
+
+        ctx.fillStyle = '#5a5550';
+        ctx.font = `300 12px ${SC}`;
+        ctx.letterSpacing = '0.8px';
+        lp(data.bottomLine, w / 2, h - pad);
+      }
     }
 
     function wrapText(ctx, text, maxWidth) {
@@ -677,7 +713,8 @@
     function drawSocials(container) {
       const dpr = window.devicePixelRatio || 1;
       const w = 680;
-      const h = 388;
+      const s = isMobile ? 1.5 : 1;
+      const h = isMobile ? 680 : 388;
       const canvas = document.createElement('canvas');
       canvas.width = w * dpr;
       canvas.height = h * dpr;
@@ -685,7 +722,6 @@
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
 
-      // Background
       ctx.fillStyle = '#ede8df';
       ctx.beginPath();
       ctx.roundRect(0, 0, w, h, 3);
@@ -708,39 +744,53 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#3a3632';
-      ctx.font = `400 16px ${SC}`;
+      ctx.font = `400 ${16 * s}px ${SC}`;
       ctx.letterSpacing = '5px';
-      letterpress(ctx, 'Connect', w / 2, 60);
+      letterpress(ctx, 'Connect', w / 2, isMobile ? 80 : 60);
 
       // Thin rule
       ctx.shadowColor = 'transparent';
       ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
       ctx.lineWidth = 0.5;
+      const ruleY = isMobile ? 108 : 80;
       ctx.beginPath();
-      ctx.moveTo(w * 0.35, 80);
-      ctx.lineTo(w * 0.65, 80);
+      ctx.moveTo(w * 0.35, ruleY);
+      ctx.lineTo(w * 0.65, ruleY);
       ctx.stroke();
 
       // Links
-      const startY = 120;
-      const gap = 46;
+      const startY = isMobile ? 160 : 120;
+      const gap = isMobile ? 80 : 46;
 
       links.forEach((link, i) => {
         const y = startY + i * gap;
 
-        // Label (left)
-        ctx.textAlign = 'right';
-        ctx.fillStyle = '#8a8580';
-        ctx.font = `400 12px ${SC}`;
-        ctx.letterSpacing = '2px';
-        letterpress(ctx, link.label, w / 2 - 20, y);
+        if (isMobile) {
+          // Stacked: label above, value below, both centered
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#8a8580';
+          ctx.font = `400 ${12 * s}px ${SC}`;
+          ctx.letterSpacing = '2px';
+          letterpress(ctx, link.label, w / 2, y);
 
-        // Value (right)
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#3a3632';
-        ctx.font = `400 14px ${BODY_FONT}`;
-        ctx.letterSpacing = '0.5px';
-        letterpress(ctx, link.value, w / 2 + 20, y);
+          ctx.fillStyle = '#3a3632';
+          ctx.font = `400 ${14 * s}px ${BODY_FONT}`;
+          ctx.letterSpacing = '0.5px';
+          letterpress(ctx, link.value, w / 2, y + 28);
+        } else {
+          // Side by side: label left, value right
+          ctx.textAlign = 'right';
+          ctx.fillStyle = '#8a8580';
+          ctx.font = `400 12px ${SC}`;
+          ctx.letterSpacing = '2px';
+          letterpress(ctx, link.label, w / 2 - 20, y);
+
+          ctx.textAlign = 'left';
+          ctx.fillStyle = '#3a3632';
+          ctx.font = `400 14px ${BODY_FONT}`;
+          ctx.letterSpacing = '0.5px';
+          letterpress(ctx, link.value, w / 2 + 20, y);
+        }
       });
     }
 
