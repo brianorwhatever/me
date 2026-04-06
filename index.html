@@ -20,48 +20,19 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #1c1612;
+      background-color: #141210;
       background-image:
-        /* Wood grain — tight horizontal streaks */
-        repeating-linear-gradient(
-          178deg,
-          transparent,
-          transparent 2px,
-          rgba(60,45,30,0.08) 2px,
-          rgba(60,45,30,0.08) 3px,
-          transparent 3px,
-          transparent 7px,
-          rgba(40,28,18,0.06) 7px,
-          rgba(40,28,18,0.06) 8px
-        ),
-        /* Wider grain bands */
-        repeating-linear-gradient(
-          179deg,
-          transparent,
-          transparent 18px,
-          rgba(80,55,35,0.07) 18px,
-          rgba(80,55,35,0.07) 22px,
-          transparent 22px,
-          transparent 45px,
-          rgba(50,35,20,0.05) 45px,
-          rgba(50,35,20,0.05) 47px
-        ),
-        /* Warm wood undertone with variation */
-        linear-gradient(
-          180deg,
-          #1c1612 0%,
-          #231a14 15%,
-          #1e1510 30%,
-          #211812 50%,
-          #1c1612 65%,
-          #201710 80%,
-          #1c1612 100%
-        ),
-        /* Subtle lateral sheen like polished wood */
+        /* Vignette */
         radial-gradient(
-          ellipse 120% 60% at 30% 50%,
-          rgba(70,50,30,0.08) 0%,
-          transparent 70%
+          ellipse 80% 70% at 50% 50%,
+          transparent 0%,
+          rgba(0,0,0,0.3) 100%
+        ),
+        /* Very subtle warm shift */
+        radial-gradient(
+          ellipse 60% 50% at 45% 45%,
+          rgba(30,22,16,0.4) 0%,
+          transparent 100%
         );
       overflow-x: hidden;
       user-select: none;
