@@ -174,7 +174,7 @@
       }
     }
 
-    /* Mobile landscape: fill viewport */
+    /* Mobile landscape: fill viewport, cap height */
     @media (max-width: 860px) and (orientation: landscape) {
       body {
         padding: 12px;
@@ -184,9 +184,12 @@
       }
       .mega-stack {
         width: calc(100vw - 24px);
+        max-height: calc(100vh - 60px);
       }
       .mega-stack canvas {
         border-radius: 3px;
+        max-height: calc(100vh - 60px);
+        object-fit: contain;
       }
       .cta {
         margin-top: 10px;
@@ -545,14 +548,17 @@
 
       function updateStack() {
         const frontPage = pages[currentIdx];
+        const maxH = window.innerHeight - 60;
         const ratio = frontPage.height / frontPage.width;
-        const h = container.offsetWidth * ratio;
+        const rawH = container.offsetWidth * ratio;
+        const h = Math.min(rawH, maxH);
         container.style.height = h + 'px';
 
         pages.forEach((page, i) => {
           page.className = '';
           const r = page.height / page.width;
-          page.style.height = (container.offsetWidth * r) + 'px';
+          const pH = Math.min(container.offsetWidth * r, maxH);
+          page.style.height = pH + 'px';
 
           if (i === currentIdx) {
             page.classList.add('page-front');
