@@ -99,6 +99,17 @@
       box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 3px 8px rgba(0,0,0,0.35);
     }
 
+    .link-overlay {
+      position: absolute;
+      z-index: 9999;
+      display: block;
+    }
+
+    .link-overlay a {
+      position: absolute;
+      cursor: pointer;
+    }
+
     .cta {
       font-family: 'Crimson Pro', serif;
       font-size: 14px;
@@ -462,23 +473,34 @@
       });
     }
 
+    // Link registry: pageIndex -> array of { href, top%, left%, width%, height% }
+    const pageLinks = {};
+
+    function registerLinks(pageIdx, links) {
+      pageLinks[pageIdx] = links;
+    }
+
     // Set up click-to-cycle on a page stack container
     function setupPageStack(containerId) {
       const container = document.getElementById(containerId);
       const pages = Array.from(container.querySelectorAll('canvas'));
       if (pages.length === 0) return;
 
+      // Create link overlay
+      const overlay = document.createElement('div');
+      overlay.className = 'link-overlay';
+      container.appendChild(overlay);
+
       let currentIdx = 0;
 
       function updateStack() {
         const frontPage = pages[currentIdx];
-        // Set container height to match the front page's aspect ratio
         const ratio = frontPage.height / frontPage.width;
-        container.style.height = (container.offsetWidth * ratio) + 'px';
+        const h = container.offsetWidth * ratio;
+        container.style.height = h + 'px';
 
         pages.forEach((page, i) => {
           page.className = '';
-          // Each canvas keeps its own aspect ratio
           const r = page.height / page.width;
           page.style.height = (container.offsetWidth * r) + 'px';
 
@@ -490,11 +512,34 @@
             page.style.zIndex = i < currentIdx ? i : pages.length - Math.abs(i - currentIdx);
           }
         });
+
+        // Update link overlay
+        overlay.innerHTML = '';
+        overlay.style.width = container.offsetWidth + 'px';
+        overlay.style.height = h + 'px';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        // Match front page transform
+        overlay.style.transform = 'translate(-3px, -3px)';
+
+        const links = pageLinks[currentIdx] || [];
+        links.forEach(link => {
+          const a = document.createElement('a');
+          a.href = link.href;
+          if (link.target) a.target = link.target;
+          a.style.top = link.top;
+          a.style.left = link.left;
+          a.style.width = link.width;
+          a.style.height = link.height;
+          a.addEventListener('click', (e) => e.stopPropagation());
+          overlay.appendChild(a);
+        });
       }
 
       updateStack();
 
-      container.addEventListener('click', () => {
+      container.addEventListener('click', (e) => {
+        if (e.target.closest('a')) return;
         currentIdx = (currentIdx + 1) % pages.length;
         updateStack();
       });
@@ -703,9 +748,16 @@
     // fonts only used on canvas since no DOM elements reference them
     Promise.all(fontPromises).then(() => {
       const stack = document.getElementById('megaStack');
+      const pageCount = () => stack.querySelectorAll('canvas').length;
 
-      // 1. Business cards on letter-size pages
-      CARDS.forEach(card => drawCardOnPage(stack, card));
+      // 1. Business cards
+      CARDS.forEach((card, ci) => {
+        const idx = pageCount();
+        drawCardOnPage(stack, card);
+        registerLinks(idx, [
+          { href: 'mailto:' + card.email, top: '8%', left: '4%', width: '35%', height: '12%' },
+        ]);
+      });
 
       // 2. Brief pages
       drawBrief();
@@ -714,7 +766,14 @@
       drawProposal();
 
       // 4. Social links page
+      const socialsIdx = pageCount();
       drawSocials(stack);
+      registerLinks(socialsIdx, [
+        { href: 'mailto:brian@aviary.tech', top: '26%', left: '50%', width: '40%', height: '10%' },
+        { href: 'https://github.com/brianorwhatever', target: '_blank', top: '38%', left: '50%', width: '40%', height: '10%' },
+        { href: 'https://x.com/brianorwhatever', target: '_blank', top: '50%', left: '50%', width: '40%', height: '10%' },
+        { href: 'https://t.me/brianbrian51', target: '_blank', top: '62%', left: '50%', width: '40%', height: '10%' },
+      ]);
 
       // One unified click-to-cycle
       setupPageStack('megaStack');
