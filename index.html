@@ -183,14 +183,17 @@
     .doc-icon {
       cursor: pointer;
       transition: transform 0.3s ease;
+      width: 500px;
     }
 
     .doc-icon:hover {
-      transform: scale(1.05);
+      transform: scale(1.03);
     }
 
     .doc-icon canvas {
       display: block;
+      width: 100%;
+      height: auto;
     }
 
     /* Responsive scaling */
@@ -218,7 +221,7 @@
   </div>
   <div class="page-stack" id="briefStack"></div>
   <div class="doc-icon" id="proposalIcon">
-    <canvas id="proposalIconCanvas" width="200" height="260"></canvas>
+    <canvas id="proposalIconCanvas" width="500" height="420"></canvas>
   </div>
   <div class="page-stack" id="proposalStack" style="display:none;"></div>
   <script>
@@ -700,53 +703,72 @@
     function drawProposalIcon() {
       const canvas = document.getElementById('proposalIconCanvas');
       const dpr = window.devicePixelRatio || 1;
-      const w = 200;
-      const h = 260;
+      const w = 500;
+      const h = 420;
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       const ctx = canvas.getContext('2d');
       ctx.scale(dpr, dpr);
 
       const cx = w / 2;
-      const cy = 100;
-      const pageW = 60;
-      const pageH = 78;
-      const color = 'rgba(58, 54, 50, 0.25)';
-      const lineColor = 'rgba(58, 54, 50, 0.15)';
+      const cy = 180;
+      const pageW = 170;
+      const pageH = 220;
 
-      // Five fanned pages
-      const angles = [-20, -10, 0, 10, 20];
-      angles.forEach(angle => {
+      // Scattered pile of pages — each with slight random offset and rotation
+      const pages = [
+        { angle: -12, dx: -30, dy: 15 },
+        { angle: 8,   dx: 25,  dy: 10 },
+        { angle: -4,  dx: -10, dy: -5 },
+        { angle: 15,  dx: 20,  dy: -8 },
+        { angle: -7,  dx: -18, dy: 5 },
+        { angle: 2,   dx: 5,   dy: -2 },
+        { angle: -1,  dx: -3,  dy: 0 },
+      ];
+
+      pages.forEach((p, idx) => {
         ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(angle * Math.PI / 180);
+        ctx.translate(cx + p.dx, cy + p.dy);
+        ctx.rotate(p.angle * Math.PI / 180);
 
-        ctx.fillStyle = '#f0ebe3';
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 0.8;
+        // Page shadow
+        ctx.shadowColor = 'rgba(0,0,0,0.12)';
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 3;
+        ctx.shadowBlur = 6;
+
+        // Page
+        ctx.fillStyle = idx === pages.length - 1 ? '#ede8df' : '#f0ebe3';
+        ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
+        ctx.lineWidth = 0.5;
         ctx.beginPath();
         ctx.rect(-pageW / 2, -pageH / 2, pageW, pageH);
         ctx.fill();
         ctx.stroke();
 
-        if (angle === 0) {
+        ctx.shadowColor = 'transparent';
+
+        // Text lines on top pages
+        if (idx >= pages.length - 3) {
+          const lineColor = 'rgba(58, 54, 50, 0.1)';
           ctx.fillStyle = lineColor;
-          for (let i = 0; i < 6; i++) {
-            const lw = i === 0 ? 30 : (20 + Math.random() * 16);
-            ctx.fillRect(-lw / 2, -pageH / 2 + 12 + i * 9, lw, 2.5);
+          const numLines = idx === pages.length - 1 ? 10 : 7;
+          for (let i = 0; i < numLines; i++) {
+            const lw = i === 0 ? pageW * 0.45 : (pageW * 0.3 + Math.random() * pageW * 0.35);
+            ctx.fillRect(-pageW / 2 + 18, -pageH / 2 + 22 + i * 16, lw, 3);
           }
         }
 
         ctx.restore();
       });
 
-      // Label below icon
+      // Label below pile
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
       ctx.fillStyle = 'rgba(200, 190, 175, 0.85)';
-      ctx.font = `400 13px ${SC}`;
-      ctx.letterSpacing = '3px';
-      ctx.fillText('Praxis Proposal', cx, cy + pageH / 2 + 20);
+      ctx.font = `400 15px ${SC}`;
+      ctx.letterSpacing = '4px';
+      ctx.fillText('Praxis Proposal', cx, cy + pageH / 2 + 24);
     }
 
     document.fonts.ready.then(() => {
