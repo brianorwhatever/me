@@ -73,7 +73,6 @@
       width: 680px;
       cursor: pointer;
       overflow: hidden;
-      margin-bottom: 36px;
       transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
@@ -99,18 +98,13 @@
       box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 3px 8px rgba(0,0,0,0.35);
     }
 
-    .mega-stack::after {
-      content: 'click for next';
-      position: absolute;
-      bottom: -28px;
-      left: 50%;
-      transform: translateX(-50%);
+    .cta {
       font-family: 'Crimson Pro', serif;
       font-size: 12px;
       font-weight: 300;
       letter-spacing: 2px;
       color: rgba(180, 170, 155, 0.5);
-      pointer-events: none;
+      margin-top: 12px;
     }
 
     /* Responsive scaling */
@@ -123,6 +117,7 @@
 </head>
 <body>
   <div class="mega-stack" id="megaStack"></div>
+  <div class="cta">click for next</div>
   <script>
     // Load fonts via FontFace API for reliable canvas rendering
     const fontData = [
