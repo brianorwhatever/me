@@ -121,6 +121,10 @@
       border-color: rgba(180, 170, 155, 0.4);
     }
 
+    .rotate-hint {
+      display: none;
+    }
+
     /* Responsive scaling */
     @media (max-width: 860px) {
       body {
@@ -138,10 +142,61 @@
         font-size: 13px;
       }
     }
+
+    @media (max-width: 860px) and (orientation: portrait) {
+      .rotate-hint {
+        display: block;
+        font-family: 'Crimson Pro', serif;
+        font-size: 13px;
+        font-weight: 300;
+        letter-spacing: 2px;
+        color: rgba(200, 190, 175, 0.6);
+        margin-bottom: 16px;
+        text-align: center;
+      }
+
+      .rotate-hint .rotate-icon {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 1.5px solid rgba(200, 190, 175, 0.4);
+        border-radius: 3px;
+        margin-right: 8px;
+        vertical-align: middle;
+        position: relative;
+        animation: nudge 3s ease-in-out infinite;
+      }
+
+      .rotate-hint .rotate-icon::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+        width: 0;
+        height: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-bottom: 5px solid rgba(200, 190, 175, 0.4);
+      }
+
+      @keyframes nudge {
+        0%, 100% { transform: rotate(0deg); }
+        15% { transform: rotate(15deg); }
+        30% { transform: rotate(0deg); }
+      }
+    }
+
+    @media (orientation: landscape) {
+      .rotate-hint {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body>
   <svg style="position:absolute;width:0;height:0"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></svg>
+  <div class="rotate-hint"><span class="rotate-icon"></span>rotate for best experience</div>
   <div class="mega-stack" id="megaStack"></div>
   <div class="cta">click for next</div>
   <script>
