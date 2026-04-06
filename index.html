@@ -180,6 +180,19 @@
       box-shadow: 0 6px 20px rgba(0,0,0,0.45), 0 3px 8px rgba(0,0,0,0.35);
     }
 
+    .doc-icon {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .doc-icon:hover {
+      transform: scale(1.05);
+    }
+
+    .doc-icon canvas {
+      display: block;
+    }
+
     /* Responsive scaling */
     @media (max-width: 860px) {
       .card-stack,
@@ -204,7 +217,10 @@
     </div>
   </div>
   <div class="page-stack" id="briefStack"></div>
-  <div class="page-stack" id="proposalStack"></div>
+  <div class="doc-icon" id="proposalIcon">
+    <canvas id="proposalIconCanvas" width="200" height="260"></canvas>
+  </div>
+  <div class="page-stack" id="proposalStack" style="display:none;"></div>
   <script>
     const CARDS = [
       {
@@ -651,81 +667,107 @@
       ];
 
       renderDocument('proposalStack', (ctx, startY) => {
-        const cx = PAGE_W / 2;
-        const iconY = startY + 40;
-        const pageW = 32;
-        const pageH = 42;
-        const color = 'rgba(58, 54, 50, 0.2)';
-        const lineColor = 'rgba(58, 54, 50, 0.12)';
-
-        // Draw fanned pages — 5 pages fanned out from center
-        const angles = [-18, -9, 0, 9, 18];
-        angles.forEach(angle => {
-          ctx.save();
-          ctx.translate(cx, iconY);
-          ctx.rotate(angle * Math.PI / 180);
-
-          // Page rectangle
-          ctx.fillStyle = '#f0ebe3';
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 0.8;
-          ctx.beginPath();
-          ctx.rect(-pageW / 2, -pageH / 2, pageW, pageH);
-          ctx.fill();
-          ctx.stroke();
-
-          // Text lines on the center page
-          if (angle === 0) {
-            ctx.fillStyle = lineColor;
-            for (let i = 0; i < 5; i++) {
-              const lw = i === 0 ? 16 : (12 + Math.random() * 8);
-              ctx.fillRect(-lw / 2, -pageH / 2 + 8 + i * 6, lw, 2);
-            }
-          }
-
-          ctx.restore();
-        });
-
-        const textTop = iconY + pageH / 2 + 24;
-
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#3a3632';
         ctx.font = `400 18px ${SC}`;
         ctx.letterSpacing = '4px';
-        letterpress(ctx, 'Praxis Project Proposal', cx, textTop);
+        letterpress(ctx, 'Praxis Project Proposal', PAGE_W / 2, startY);
 
         ctx.font = `400 12px ${BODY_FONT}`;
         ctx.letterSpacing = '0.5px';
         ctx.fillStyle = '#4a4540';
-        letterpress(ctx, 'Secure and Privacy-Aware Digital Provenance Across Layered Ownership Systems', cx, textTop + 28);
+        letterpress(ctx, 'Secure and Privacy-Aware Digital Provenance Across Layered Ownership Systems', PAGE_W / 2, startY + 28);
 
         ctx.shadowColor = 'transparent';
         ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
         ctx.lineWidth = 0.5;
         ctx.beginPath();
-        ctx.moveTo(PAD, textTop + 52);
-        ctx.lineTo(PAGE_W - PAD, textTop + 52);
+        ctx.moveTo(PAD, startY + 52);
+        ctx.lineTo(PAGE_W - PAD, startY + 52);
         ctx.stroke();
 
         ctx.font = `400 12px ${SC}`;
         ctx.letterSpacing = '1.5px';
         ctx.fillStyle = '#3a3632';
         ctx.textAlign = 'left';
-        letterpress(ctx, 'Brian Richter  \u00b7  Aviary Tech  \u00b7  University of Victoria  \u00b7  April 2026', PAD, textTop + 62);
+        letterpress(ctx, 'Brian Richter  \u00b7  Aviary Tech  \u00b7  University of Victoria  \u00b7  April 2026', PAD, startY + 62);
 
-        return textTop + 90;
+        return startY + 90;
       }, proposalContent);
+    }
+
+    function drawProposalIcon() {
+      const canvas = document.getElementById('proposalIconCanvas');
+      const dpr = window.devicePixelRatio || 1;
+      const w = 200;
+      const h = 260;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const cx = w / 2;
+      const cy = 100;
+      const pageW = 60;
+      const pageH = 78;
+      const color = 'rgba(58, 54, 50, 0.25)';
+      const lineColor = 'rgba(58, 54, 50, 0.15)';
+
+      // Five fanned pages
+      const angles = [-20, -10, 0, 10, 20];
+      angles.forEach(angle => {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle * Math.PI / 180);
+
+        ctx.fillStyle = '#f0ebe3';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.rect(-pageW / 2, -pageH / 2, pageW, pageH);
+        ctx.fill();
+        ctx.stroke();
+
+        if (angle === 0) {
+          ctx.fillStyle = lineColor;
+          for (let i = 0; i < 6; i++) {
+            const lw = i === 0 ? 30 : (20 + Math.random() * 16);
+            ctx.fillRect(-lw / 2, -pageH / 2 + 12 + i * 9, lw, 2.5);
+          }
+        }
+
+        ctx.restore();
+      });
+
+      // Label below icon
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = 'rgba(200, 190, 175, 0.85)';
+      ctx.font = `400 13px ${SC}`;
+      ctx.letterSpacing = '3px';
+      ctx.fillText('Praxis Proposal', cx, cy + pageH / 2 + 20);
     }
 
     document.fonts.ready.then(() => {
       CARDS.forEach(card => drawCard(card.id, card));
 
-      // Render and set up page stacks
+      // Render page stacks
       drawBrief();
       setupPageStack('briefStack');
-      drawProposal();
-      setupPageStack('proposalStack');
+
+      // Draw proposal icon — click to reveal proposal
+      drawProposalIcon();
+      let proposalRevealed = false;
+      document.getElementById('proposalIcon').addEventListener('click', () => {
+        if (!proposalRevealed) {
+          drawProposal();
+          setupPageStack('proposalStack');
+          proposalRevealed = true;
+        }
+        document.getElementById('proposalIcon').style.display = 'none';
+        document.getElementById('proposalStack').style.display = '';
+      });
 
       // Set initial positions
       document.getElementById('card1wrapper').classList.add('front');
