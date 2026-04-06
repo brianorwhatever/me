@@ -238,7 +238,7 @@
     const SC = '"Cormorant SC", serif';
     const REG = '"Cormorant", serif';
 
-    const isMobile = window.innerWidth < 600;
+    let isMobile = window.innerWidth < 600;
 
     function drawCardOnPage(container, data) {
       const dpr = window.devicePixelRatio || 1;
@@ -523,7 +523,7 @@
     }
 
     // Set up click-to-cycle on a page stack container
-    function setupPageStack(containerId) {
+    function setupPageStack(containerId, startIdx) {
       const container = document.getElementById(containerId);
       const pages = Array.from(container.querySelectorAll('canvas'));
       if (pages.length === 0) return;
@@ -533,7 +533,7 @@
       overlay.className = 'link-overlay';
       container.appendChild(overlay);
 
-      let currentIdx = 0;
+      let currentIdx = startIdx || 0;
 
       function updateStack() {
         const frontPage = pages[currentIdx];
@@ -578,6 +578,7 @@
             if (link.action === 'goToLast') {
               e.preventDefault();
               currentIdx = pages.length - 1;
+              currentPageIdx = currentIdx;
               updateStack();
             }
           });
@@ -590,6 +591,7 @@
       container.addEventListener('click', (e) => {
         if (e.target.closest('a')) return;
         currentIdx = (currentIdx + 1) % pages.length;
+        currentPageIdx = currentIdx;
         updateStack();
       });
     }
@@ -791,8 +793,17 @@
 
     // Explicitly load all fonts — document.fonts.ready won't trigger for
     // fonts only used on canvas since no DOM elements reference them
-    Promise.all(fontPromises).then(() => {
+    let currentPageIdx = 0;
+    let stackController = null;
+
+    function renderAll() {
+      isMobile = window.innerWidth < 600;
       const stack = document.getElementById('megaStack');
+
+      // Clear existing canvases and overlays
+      stack.innerHTML = '';
+      Object.keys(pageLinks).forEach(k => delete pageLinks[k]);
+
       const pageCount = () => stack.querySelectorAll('canvas').length;
 
       // 1. Business cards
@@ -821,12 +832,25 @@
         { href: 'https://t.me/brianbrian51', target: '_blank', top: '62%', left: '50%', width: '40%', height: '10%' },
       ]);
 
-      // One unified click-to-cycle
-      setupPageStack('megaStack');
+      // Set up stack with preserved page index
+      const totalPages = stack.querySelectorAll('canvas').length;
+      if (currentPageIdx >= totalPages) currentPageIdx = 0;
+      stackController = setupPageStack('megaStack', currentPageIdx);
+    }
 
-      // CTA also triggers next page
+    Promise.all(fontPromises).then(() => {
+      renderAll();
+
+      // CTA triggers next page
       document.querySelector('.cta').addEventListener('click', () => {
         document.getElementById('megaStack').click();
+      });
+
+      // Re-render on resize/orientation change
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(renderAll, 200);
       });
     });
   </script>
