@@ -629,6 +629,76 @@
       }, proposalContent);
     }
 
+    function drawSocials(container) {
+      const dpr = window.devicePixelRatio || 1;
+      const w = 680;
+      const h = 388;
+      const canvas = document.createElement('canvas');
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      container.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      // Background
+      ctx.fillStyle = '#ede8df';
+      ctx.beginPath();
+      ctx.roundRect(0, 0, w, h, 3);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.roundRect(0.5, 0.5, w - 1, h - 1, 3);
+      ctx.stroke();
+
+      const links = [
+        { label: 'email', value: 'brian@aviary.tech' },
+        { label: 'github', value: 'brianorwhatever' },
+        { label: 'x', value: '@brianorwhatever' },
+        { label: 'telegram', value: '@brianbrian51' },
+        { label: 'discord', value: 'brian51' },
+      ];
+
+      // Title
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#3a3632';
+      ctx.font = `400 16px ${SC}`;
+      ctx.letterSpacing = '5px';
+      letterpress(ctx, 'Connect', w / 2, 60);
+
+      // Thin rule
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
+      ctx.lineWidth = 0.5;
+      ctx.beginPath();
+      ctx.moveTo(w * 0.35, 80);
+      ctx.lineTo(w * 0.65, 80);
+      ctx.stroke();
+
+      // Links
+      const startY = 120;
+      const gap = 46;
+
+      links.forEach((link, i) => {
+        const y = startY + i * gap;
+
+        // Label (left)
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#8a8580';
+        ctx.font = `400 12px ${SC}`;
+        ctx.letterSpacing = '2px';
+        letterpress(ctx, link.label, w / 2 - 20, y);
+
+        // Value (right)
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#3a3632';
+        ctx.font = `400 14px ${BODY_FONT}`;
+        ctx.letterSpacing = '0.5px';
+        letterpress(ctx, link.value, w / 2 + 20, y);
+      });
+    }
+
     // Explicitly load all fonts — document.fonts.ready won't trigger for
     // fonts only used on canvas since no DOM elements reference them
     Promise.all(fontPromises).then(() => {
@@ -642,6 +712,9 @@
 
       // 3. Proposal pages
       drawProposal();
+
+      // 4. Social links page
+      drawSocials(stack);
 
       // One unified click-to-cycle
       setupPageStack('megaStack');
