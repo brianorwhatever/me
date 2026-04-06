@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="description" content="Personal website">
   <meta name="robots" content="noindex, nofollow">
   <title>.</title>
@@ -60,7 +60,8 @@
       width: 680px;
       cursor: pointer;
       overflow: hidden;
-      transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.3s ease;
     }
 
     .mega-stack canvas {
@@ -121,100 +122,42 @@
       border-color: rgba(180, 170, 155, 0.4);
     }
 
-    .rotate-hint {
+    .zoom-hint {
       display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
       font-family: 'Crimson Pro', serif;
-      font-size: 15px;
+      font-size: 12px;
       font-weight: 300;
       letter-spacing: 2px;
-      color: rgba(200, 190, 175, 0.6);
-      text-align: center;
+      color: rgba(200, 190, 175, 0.45);
+      margin-top: 8px;
     }
 
-    .rotate-hint .rotate-icon {
-      display: block;
-      width: 40px;
-      height: 56px;
-      border: 2px solid rgba(200, 190, 175, 0.35);
-      border-radius: 6px;
-      position: relative;
-      animation: tilt 3s ease-in-out infinite;
-    }
-
-    .rotate-hint .rotate-icon::after {
-      content: '';
-      position: absolute;
-      bottom: 6px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(200, 190, 175, 0.3);
-    }
-
-    @keyframes tilt {
-      0%, 100% { transform: rotate(0deg); }
-      20% { transform: rotate(90deg); }
-      40% { transform: rotate(90deg); }
-      60% { transform: rotate(0deg); }
-    }
-
-    /* JS controls rotate hint and content visibility on mobile */
-
-    /* Mobile portrait: fill width for document pages */
-    @media (max-width: 860px) and (orientation: portrait) {
+    /* Mobile */
+    @media (max-width: 860px) {
       body {
-        padding: 16px;
+        padding: 12px;
       }
       .mega-stack {
-        width: calc(100vw - 32px);
+        width: calc(100vw - 24px);
       }
       .cta {
         margin-top: 12px;
         font-size: 13px;
       }
-    }
-
-    /* Mobile landscape: fill viewport */
-    @media (max-width: 860px) and (orientation: landscape) {
-      body {
-        padding: 12px;
-      }
-      .rotate-hint {
-        display: none !important;
-      }
-      .mega-stack {
-        width: calc(100vw - 24px);
-      }
-      .mega-stack canvas {
-        border-radius: 3px;
-      }
-      .cta {
-        margin-top: 10px;
-        font-size: 12px;
+      .zoom-hint {
+        display: block;
       }
       .link-overlay a {
         border-bottom: none !important;
-      }
-    }
-
-    /* Desktop: never show rotate hint */
-    @media (min-width: 861px) {
-      .rotate-hint {
-        display: none !important;
       }
     }
   </style>
 </head>
 <body>
   <svg style="position:absolute;width:0;height:0"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></svg>
-  <div class="rotate-hint"><span class="rotate-icon"></span><span class="hint-text">rotate for best experience</span></div>
   <div class="mega-stack" id="megaStack"></div>
   <div class="cta">click for next</div>
+  <div class="zoom-hint">pinch to zoom</div>
   <script>
     // Load fonts via FontFace API for reliable canvas rendering
     const fontData = [
@@ -554,24 +497,6 @@
 
       function updateStack() {
         const frontPage = pages[currentIdx];
-        const needed = frontPage.dataset.orientation || 'landscape';
-        const isPortrait = window.matchMedia('(orientation: portrait)').matches;
-        const isLandscape = !isPortrait;
-        const hint = document.querySelector('.rotate-hint');
-        const cta = document.querySelector('.cta');
-        const mobile = window.innerWidth < 860 || window.innerHeight < 860;
-
-        if (mobile) {
-          const mismatch = (needed === 'landscape' && isPortrait) || (needed === 'portrait' && isLandscape);
-          container.style.display = mismatch ? 'none' : '';
-          if (cta) cta.style.display = mismatch ? 'none' : '';
-          if (hint) {
-            hint.style.display = mismatch ? 'flex' : 'none';
-            hint.querySelector('.hint-text').textContent = needed === 'portrait'
-              ? 'rotate back to portrait to read' : 'rotate for best experience';
-          }
-        }
-
         const maxH = window.innerHeight - 60;
         const ratio = frontPage.height / frontPage.width;
         const rawH = container.offsetWidth * ratio;
@@ -890,6 +815,82 @@
       window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(renderAll, 200);
+      });
+
+      // Pinch-to-zoom: hijack pinch gesture to scale the stack via CSS transform
+      const stack = document.getElementById('megaStack');
+      let zoomLevel = 1;
+      let startDist = 0;
+      let startZoom = 1;
+      let panX = 0, panY = 0;
+      let startPanX = 0, startPanY = 0;
+      let startMidX = 0, startMidY = 0;
+
+      function getTouchDist(touches) {
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+      }
+
+      function getTouchMid(touches) {
+        return {
+          x: (touches[0].clientX + touches[1].clientX) / 2,
+          y: (touches[0].clientY + touches[1].clientY) / 2
+        };
+      }
+
+      function applyZoom() {
+        if (zoomLevel <= 1) {
+          zoomLevel = 1;
+          panX = 0;
+          panY = 0;
+        }
+        stack.style.transformOrigin = 'center center';
+        stack.style.transform = `scale(${zoomLevel}) translate(${panX}px, ${panY}px)`;
+      }
+
+      document.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          startDist = getTouchDist(e.touches);
+          startZoom = zoomLevel;
+          const mid = getTouchMid(e.touches);
+          startMidX = mid.x;
+          startMidY = mid.y;
+          startPanX = panX;
+          startPanY = panY;
+        }
+      }, { passive: false });
+
+      document.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          const dist = getTouchDist(e.touches);
+          zoomLevel = Math.max(1, Math.min(5, startZoom * (dist / startDist)));
+
+          // Pan follows finger midpoint
+          const mid = getTouchMid(e.touches);
+          panX = startPanX + (mid.x - startMidX) / zoomLevel;
+          panY = startPanY + (mid.y - startMidY) / zoomLevel;
+
+          applyZoom();
+        }
+      }, { passive: false });
+
+      // Double-tap to reset zoom
+      let lastTap = 0;
+      document.addEventListener('touchend', (e) => {
+        if (e.touches.length === 0) {
+          const now = Date.now();
+          if (now - lastTap < 300) {
+            zoomLevel = 1;
+            panX = 0;
+            panY = 0;
+            applyZoom();
+            e.preventDefault();
+          }
+          lastTap = now;
+        }
       });
     });
   </script>
