@@ -651,33 +651,70 @@
       ];
 
       renderDocument('proposalStack', (ctx, startY) => {
+        const cx = PAGE_W / 2;
+        const iconY = startY + 40;
+        const pageW = 32;
+        const pageH = 42;
+        const color = 'rgba(58, 54, 50, 0.2)';
+        const lineColor = 'rgba(58, 54, 50, 0.12)';
+
+        // Draw fanned pages — 5 pages fanned out from center
+        const angles = [-18, -9, 0, 9, 18];
+        angles.forEach(angle => {
+          ctx.save();
+          ctx.translate(cx, iconY);
+          ctx.rotate(angle * Math.PI / 180);
+
+          // Page rectangle
+          ctx.fillStyle = '#f0ebe3';
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.rect(-pageW / 2, -pageH / 2, pageW, pageH);
+          ctx.fill();
+          ctx.stroke();
+
+          // Text lines on the center page
+          if (angle === 0) {
+            ctx.fillStyle = lineColor;
+            for (let i = 0; i < 5; i++) {
+              const lw = i === 0 ? 16 : (12 + Math.random() * 8);
+              ctx.fillRect(-lw / 2, -pageH / 2 + 8 + i * 6, lw, 2);
+            }
+          }
+
+          ctx.restore();
+        });
+
+        const textTop = iconY + pageH / 2 + 24;
+
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#3a3632';
         ctx.font = `400 18px ${SC}`;
         ctx.letterSpacing = '4px';
-        letterpress(ctx, 'Praxis Project Proposal', PAGE_W / 2, startY);
+        letterpress(ctx, 'Praxis Project Proposal', cx, textTop);
 
         ctx.font = `400 12px ${BODY_FONT}`;
         ctx.letterSpacing = '0.5px';
         ctx.fillStyle = '#4a4540';
-        letterpress(ctx, 'Secure and Privacy-Aware Digital Provenance Across Layered Ownership Systems', PAGE_W / 2, startY + 28);
+        letterpress(ctx, 'Secure and Privacy-Aware Digital Provenance Across Layered Ownership Systems', cx, textTop + 28);
 
         ctx.shadowColor = 'transparent';
         ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
         ctx.lineWidth = 0.5;
         ctx.beginPath();
-        ctx.moveTo(PAD, startY + 52);
-        ctx.lineTo(PAGE_W - PAD, startY + 52);
+        ctx.moveTo(PAD, textTop + 52);
+        ctx.lineTo(PAGE_W - PAD, textTop + 52);
         ctx.stroke();
 
         ctx.font = `400 12px ${SC}`;
         ctx.letterSpacing = '1.5px';
         ctx.fillStyle = '#3a3632';
         ctx.textAlign = 'left';
-        letterpress(ctx, 'Brian Richter  \u00b7  Aviary Tech  \u00b7  University of Victoria  \u00b7  April 2026', PAD, startY + 62);
+        letterpress(ctx, 'Brian Richter  \u00b7  Aviary Tech  \u00b7  University of Victoria  \u00b7  April 2026', PAD, textTop + 62);
 
-        return startY + 90;
+        return textTop + 90;
       }, proposalContent);
     }
 
