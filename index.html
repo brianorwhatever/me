@@ -71,14 +71,13 @@
     .mega-stack {
       position: relative;
       width: 680px;
-      aspect-ratio: 8.5 / 11;
       cursor: pointer;
+      transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .mega-stack canvas {
       position: absolute;
       width: 100%;
-      height: 100%;
       border-radius: 4px;
       transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
                   box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -452,14 +451,22 @@
       let currentIdx = 0;
 
       function updateStack() {
+        const frontPage = pages[currentIdx];
+        // Set container height to match the front page's aspect ratio
+        const ratio = frontPage.height / frontPage.width;
+        container.style.height = (container.offsetWidth * ratio) + 'px';
+
         pages.forEach((page, i) => {
           page.className = '';
+          // Each canvas keeps its own aspect ratio
+          const r = page.height / page.width;
+          page.style.height = (container.offsetWidth * r) + 'px';
+
           if (i === currentIdx) {
             page.classList.add('page-front');
             page.style.zIndex = pages.length + 1;
           } else {
             page.classList.add('page-back');
-            // Stack behind pages with slight cascading offset
             page.style.zIndex = i < currentIdx ? i : pages.length - Math.abs(i - currentIdx);
           }
         });
