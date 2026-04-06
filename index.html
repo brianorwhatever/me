@@ -147,30 +147,29 @@
     const REG = '"Cormorant", serif';
 
     function drawCardOnPage(container, data) {
-      const ctx = createPage(container);
-      const cardW = 560;
-      const cardH = 320;
-      const cx = (PAGE_W - cardW) / 2;
-      const cy = (PAGE_H - cardH) / 2;
-      const w = cardW;
-      const h = cardH;
-      const pad = 36;
+      const dpr = window.devicePixelRatio || 1;
+      const w = 680;
+      const h = 388;
+      const canvas = document.createElement('canvas');
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      container.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
 
-      // Card rectangle on the page
-      ctx.fillStyle = '#f5f0e8';
+      // Card background — fills the canvas
+      ctx.fillStyle = '#ede8df';
       ctx.beginPath();
-      ctx.roundRect(cx, cy, w, h, 3);
+      ctx.roundRect(0, 0, w, h, 3);
       ctx.fill();
 
-      ctx.strokeStyle = 'rgba(160, 150, 135, 0.25)';
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
       ctx.lineWidth = 0.5;
       ctx.beginPath();
-      ctx.roundRect(cx + 0.5, cy + 0.5, w - 1, h - 1, 3);
+      ctx.roundRect(0.5, 0.5, w - 1, h - 1, 3);
       ctx.stroke();
 
-      // Offset all drawing by card position
-      ctx.save();
-      ctx.translate(cx, cy);
+      const pad = 42;
 
       const textColor = '#4a4540';
       const nameColor = '#3a3632';
@@ -254,7 +253,6 @@
       ctx.letterSpacing = '0.8px';
       letterpress(data.bottomLine, w / 2, h - pad);
 
-      ctx.restore();
     }
 
     function wrapText(ctx, text, maxWidth) {
