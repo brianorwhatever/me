@@ -123,8 +123,19 @@
 
     /* Responsive scaling */
     @media (max-width: 860px) {
+      body {
+        padding: 0;
+      }
       .mega-stack {
-        width: 92vw;
+        width: 100vw;
+        border-radius: 0;
+      }
+      .mega-stack canvas {
+        border-radius: 0;
+      }
+      .cta {
+        margin-top: 16px;
+        font-size: 13px;
       }
     }
   </style>
