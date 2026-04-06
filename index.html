@@ -100,11 +100,21 @@
 
     .cta {
       font-family: 'Crimson Pro', serif;
-      font-size: 12px;
-      font-weight: 300;
-      letter-spacing: 2px;
-      color: rgba(180, 170, 155, 0.5);
-      margin-top: 12px;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 3px;
+      color: rgba(210, 200, 185, 0.7);
+      margin-top: 24px;
+      padding: 8px 20px;
+      border: 1px solid rgba(180, 170, 155, 0.2);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .cta:hover {
+      color: rgba(230, 220, 205, 0.9);
+      border-color: rgba(180, 170, 155, 0.4);
     }
 
     /* Responsive scaling */
@@ -634,6 +644,11 @@
 
       // One unified click-to-cycle
       setupPageStack('megaStack');
+
+      // CTA also triggers next page
+      document.querySelector('.cta').addEventListener('click', () => {
+        document.getElementById('megaStack').click();
+      });
     });
   </script>
 </body>
