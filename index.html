@@ -125,71 +125,79 @@
       display: none;
     }
 
-    /* Responsive scaling */
-    @media (max-width: 860px) {
-      body {
-        padding: 0;
-      }
-      .mega-stack {
-        width: 100vw;
-        border-radius: 0;
-      }
-      .mega-stack canvas {
-        border-radius: 0;
-      }
-      .cta {
-        margin-top: 16px;
-        font-size: 13px;
-      }
-    }
-
+    /* Mobile portrait: force rotate */
     @media (max-width: 860px) and (orientation: portrait) {
+      .mega-stack, .cta {
+        display: none;
+      }
+
       .rotate-hint {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
         font-family: 'Crimson Pro', serif;
-        font-size: 13px;
+        font-size: 15px;
         font-weight: 300;
         letter-spacing: 2px;
         color: rgba(200, 190, 175, 0.6);
-        margin-bottom: 16px;
         text-align: center;
       }
 
       .rotate-hint .rotate-icon {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 1.5px solid rgba(200, 190, 175, 0.4);
-        border-radius: 3px;
-        margin-right: 8px;
-        vertical-align: middle;
+        display: block;
+        width: 40px;
+        height: 56px;
+        border: 2px solid rgba(200, 190, 175, 0.35);
+        border-radius: 6px;
         position: relative;
-        animation: nudge 3s ease-in-out infinite;
+        animation: tilt 3s ease-in-out infinite;
       }
 
       .rotate-hint .rotate-icon::after {
         content: '';
         position: absolute;
-        top: 50%;
+        bottom: 6px;
         left: 50%;
-        transform: translate(-50%, -50%) rotate(-45deg);
-        width: 0;
-        height: 0;
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-bottom: 5px solid rgba(200, 190, 175, 0.4);
+        transform: translateX(-50%);
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(200, 190, 175, 0.3);
       }
 
-      @keyframes nudge {
+      @keyframes tilt {
         0%, 100% { transform: rotate(0deg); }
-        15% { transform: rotate(15deg); }
-        30% { transform: rotate(0deg); }
+        20% { transform: rotate(90deg); }
+        40% { transform: rotate(90deg); }
+        60% { transform: rotate(0deg); }
       }
     }
 
-    @media (orientation: landscape) {
+    /* Mobile landscape: fill viewport */
+    @media (max-width: 860px) and (orientation: landscape) {
+      body {
+        padding: 12px;
+      }
       .rotate-hint {
         display: none !important;
+      }
+      .mega-stack {
+        width: calc(100vw - 24px);
+      }
+      .mega-stack canvas {
+        border-radius: 3px;
+      }
+      .cta {
+        margin-top: 10px;
+        font-size: 12px;
+      }
+    }
+
+    /* Desktop stays as-is, hide rotate hint */
+    @media (min-width: 861px) {
+      .rotate-hint {
+        display: none;
       }
     }
   </style>
