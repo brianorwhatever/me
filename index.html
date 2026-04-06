@@ -767,7 +767,9 @@
       ctx.fillText('Praxis Proposal', cx, cy + pageH / 2 + 24);
     }
 
-    document.fonts.ready.then(() => {
+    // Explicitly load all fonts — document.fonts.ready won't trigger for
+    // fonts only used on canvas since no DOM elements reference them
+    Promise.all([...document.fonts].map(f => f.load())).then(() => {
       CARDS.forEach(card => drawCard(card.id, card));
 
       // Render page stacks
