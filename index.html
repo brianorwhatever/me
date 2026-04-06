@@ -123,58 +123,63 @@
 
     .rotate-hint {
       display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      font-family: 'Crimson Pro', serif;
+      font-size: 15px;
+      font-weight: 300;
+      letter-spacing: 2px;
+      color: rgba(200, 190, 175, 0.6);
+      text-align: center;
     }
 
-    /* Mobile portrait: force rotate */
+    .rotate-hint .rotate-icon {
+      display: block;
+      width: 40px;
+      height: 56px;
+      border: 2px solid rgba(200, 190, 175, 0.35);
+      border-radius: 6px;
+      position: relative;
+      animation: tilt 3s ease-in-out infinite;
+    }
+
+    .rotate-hint .rotate-icon::after {
+      content: '';
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(200, 190, 175, 0.3);
+    }
+
+    @keyframes tilt {
+      0%, 100% { transform: rotate(0deg); }
+      20% { transform: rotate(90deg); }
+      40% { transform: rotate(90deg); }
+      60% { transform: rotate(0deg); }
+    }
+
+    /* JS controls rotate hint and content visibility on mobile */
+
+    /* Mobile portrait: fill width for document pages */
     @media (max-width: 860px) and (orientation: portrait) {
-      .mega-stack, .cta {
-        display: none;
+      body {
+        padding: 16px;
       }
-
-      .rotate-hint {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        font-family: 'Crimson Pro', serif;
-        font-size: 15px;
-        font-weight: 300;
-        letter-spacing: 2px;
-        color: rgba(200, 190, 175, 0.6);
-        text-align: center;
+      .mega-stack {
+        width: calc(100vw - 32px);
       }
-
-      .rotate-hint .rotate-icon {
-        display: block;
-        width: 40px;
-        height: 56px;
-        border: 2px solid rgba(200, 190, 175, 0.35);
-        border-radius: 6px;
-        position: relative;
-        animation: tilt 3s ease-in-out infinite;
-      }
-
-      .rotate-hint .rotate-icon::after {
-        content: '';
-        position: absolute;
-        bottom: 6px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        border: 1.5px solid rgba(200, 190, 175, 0.3);
-      }
-
-      @keyframes tilt {
-        0%, 100% { transform: rotate(0deg); }
-        20% { transform: rotate(90deg); }
-        40% { transform: rotate(90deg); }
-        60% { transform: rotate(0deg); }
+      .cta {
+        margin-top: 12px;
+        font-size: 13px;
       }
     }
 
-    /* Mobile landscape: fill viewport, cap height */
+    /* Mobile landscape: fill viewport */
     @media (max-width: 860px) and (orientation: landscape) {
       body {
         padding: 12px;
@@ -184,30 +189,30 @@
       }
       .mega-stack {
         width: calc(100vw - 24px);
-        max-height: calc(100vh - 60px);
       }
       .mega-stack canvas {
         border-radius: 3px;
-        max-height: calc(100vh - 60px);
-        object-fit: contain;
       }
       .cta {
         margin-top: 10px;
         font-size: 12px;
       }
+      .link-overlay a {
+        border-bottom: none !important;
+      }
     }
 
-    /* Desktop stays as-is, hide rotate hint */
+    /* Desktop: never show rotate hint */
     @media (min-width: 861px) {
       .rotate-hint {
-        display: none;
+        display: none !important;
       }
     }
   </style>
 </head>
 <body>
   <svg style="position:absolute;width:0;height:0"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></svg>
-  <div class="rotate-hint"><span class="rotate-icon"></span>rotate for best experience</div>
+  <div class="rotate-hint"><span class="rotate-icon"></span><span class="hint-text">rotate for best experience</span></div>
   <div class="mega-stack" id="megaStack"></div>
   <div class="cta">click for next</div>
   <script>
@@ -253,12 +258,12 @@
 
     function drawCardOnPage(container, data) {
       const dpr = window.devicePixelRatio || 1;
-      // Higher internal resolution on mobile so text stays crisp when scaled up
       const scale = isMobile ? 2 : 1;
       const w = 680 * scale;
       const h = 388 * scale;
       const pad = 42 * scale;
       const canvas = document.createElement('canvas');
+      canvas.dataset.orientation = 'landscape';
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       container.appendChild(canvas);
@@ -369,6 +374,7 @@
     function createPage(container) {
       const dpr = window.devicePixelRatio || 1;
       const canvas = document.createElement('canvas');
+      canvas.dataset.orientation = 'portrait';
       canvas.width = PAGE_W * dpr;
       canvas.height = PAGE_H * dpr;
       container.appendChild(canvas);
@@ -548,6 +554,24 @@
 
       function updateStack() {
         const frontPage = pages[currentIdx];
+        const needed = frontPage.dataset.orientation || 'landscape';
+        const isPortrait = window.matchMedia('(orientation: portrait)').matches;
+        const isLandscape = !isPortrait;
+        const hint = document.querySelector('.rotate-hint');
+        const cta = document.querySelector('.cta');
+        const mobile = window.innerWidth < 860 || window.innerHeight < 860;
+
+        if (mobile) {
+          const mismatch = (needed === 'landscape' && isPortrait) || (needed === 'portrait' && isLandscape);
+          container.style.display = mismatch ? 'none' : '';
+          if (cta) cta.style.display = mismatch ? 'none' : '';
+          if (hint) {
+            hint.style.display = mismatch ? 'flex' : 'none';
+            hint.querySelector('.hint-text').textContent = needed === 'portrait'
+              ? 'rotate back to portrait to read' : 'rotate for best experience';
+          }
+        }
+
         const maxH = window.innerHeight - 60;
         const ratio = frontPage.height / frontPage.width;
         const rawH = container.offsetWidth * ratio;
@@ -746,6 +770,7 @@
       const h = 388 * scale;
       const f = scale;
       const canvas = document.createElement('canvas');
+      canvas.dataset.orientation = 'landscape';
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       container.appendChild(canvas);
