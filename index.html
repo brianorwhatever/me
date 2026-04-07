@@ -60,8 +60,7 @@
       width: 680px;
       cursor: pointer;
       overflow: hidden;
-      transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-                  transform 0.3s ease;
+      transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .mega-stack canvas {
@@ -157,7 +156,7 @@
   <svg style="position:absolute;width:0;height:0"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></svg>
   <div class="mega-stack" id="megaStack"></div>
   <div class="cta">click for next</div>
-  <div class="zoom-hint">pinch to zoom</div>
+  <div class="zoom-hint">pinch to resize text</div>
   <script>
     // Load fonts via FontFace API for reliable canvas rendering
     const fontData = [
@@ -244,48 +243,48 @@
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
       ctx.fillStyle = textColor;
-      ctx.font = `300 ${16 * f}px ${SC}`;
-      ctx.letterSpacing = `${1 * f}px`;
+      ctx.font = `300 ${fs(16 * f)}px ${SC}`;
+      ctx.letterSpacing = `${fs(1 * f)}px`;
       lp(data.email, pad, pad);
 
       ctx.textAlign = 'right';
       ctx.fillStyle = textColor;
-      ctx.font = `400 ${17 * f}px ${SC}`;
-      ctx.letterSpacing = `${1.5 * f}px`;
+      ctx.font = `400 ${fs(17 * f)}px ${SC}`;
+      ctx.letterSpacing = `${fs(1.5 * f)}px`;
       lp(data.companyLine1, w - pad, pad);
 
       ctx.textBaseline = 'middle';
       ctx.fillStyle = nameColor;
       const nameY = h * 0.46;
 
-      ctx.font = `400 ${22 * f}px ${SC}`;
-      ctx.letterSpacing = `${3 * f}px`;
+      ctx.font = `400 ${fs(22 * f)}px ${SC}`;
+      ctx.letterSpacing = `${fs(3 * f)}px`;
       const firstW = ctx.measureText(data.firstName).width;
-      ctx.font = `400 ${27 * f}px ${REG}`;
-      ctx.letterSpacing = `${4 * f}px`;
+      ctx.font = `400 ${fs(27 * f)}px ${REG}`;
+      ctx.letterSpacing = `${fs(4 * f)}px`;
       const lastW = ctx.measureText(data.lastName).width;
       const gap = 9 * f;
       const startX = (w - firstW - gap - lastW) / 2;
 
       ctx.textAlign = 'left';
       ctx.fillStyle = nameColor;
-      ctx.font = `400 ${22 * f}px ${SC}`;
-      ctx.letterSpacing = `${3 * f}px`;
+      ctx.font = `400 ${fs(22 * f)}px ${SC}`;
+      ctx.letterSpacing = `${fs(3 * f)}px`;
       lp(data.firstName, startX, nameY);
       ctx.fillStyle = nameColor;
-      ctx.font = `400 ${27 * f}px ${REG}`;
-      ctx.letterSpacing = `${4 * f}px`;
+      ctx.font = `400 ${fs(27 * f)}px ${REG}`;
+      ctx.letterSpacing = `${fs(4 * f)}px`;
       lp(data.lastName, startX + firstW + gap, nameY);
 
       ctx.textAlign = 'center';
       ctx.fillStyle = textColor;
-      ctx.font = `300 ${16 * f}px ${SC}`;
-      ctx.letterSpacing = `${2.5 * f}px`;
+      ctx.font = `300 ${fs(16 * f)}px ${SC}`;
+      ctx.letterSpacing = `${fs(2.5 * f)}px`;
       lp(data.title, w / 2, nameY + 35 * f);
 
       ctx.fillStyle = '#5a5550';
-      ctx.font = `300 ${12 * f}px ${SC}`;
-      ctx.letterSpacing = `${0.8 * f}px`;
+      ctx.font = `300 ${fs(12 * f)}px ${SC}`;
+      ctx.letterSpacing = `${fs(0.8 * f)}px`;
       lp(data.bottomLine, w / 2, h - pad);
     }
 
@@ -308,11 +307,13 @@
 
     // --- Shared paginated document renderer ---
     const BODY_FONT = '"Crimson Pro", serif';
+    let fontScale = 1;
+    function fs(px) { return px * fontScale; }
+    function lineH() { return 24 * fontScale; }
     const PAGE_W = 680;
     const PAGE_H = Math.round(PAGE_W * (11 / 8.5));
     const PAD = 55;
     const TEXT_W = PAGE_W - PAD * 2;
-    const LINE_H = 24;
 
     function createPage(container) {
       const dpr = window.devicePixelRatio || 1;
@@ -381,7 +382,7 @@
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillStyle = '#3a3632';
-          ctx.font = `400 15px ${SC}`;
+          ctx.font = `400 ${fs(15)}px ${SC}`;
           ctx.letterSpacing = '2px';
           letterpress(ctx, item.text, PAD, curY);
           curY += 35;
@@ -393,7 +394,7 @@
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillStyle = '#4a4540';
-          ctx.font = `400 13px ${SC}`;
+          ctx.font = `400 ${fs(13)}px ${SC}`;
           ctx.letterSpacing = '1.5px';
           letterpress(ctx, item.text, PAD, curY);
           curY += 28;
@@ -401,38 +402,38 @@
         }
 
         if (item.type === 'para') {
-          ctx.font = `400 14px ${BODY_FONT}`;
+          ctx.font = `400 ${fs(14)}px ${BODY_FONT}`;
           ctx.letterSpacing = '0.2px';
           const lines = wrapText(ctx, item.text, TEXT_W);
           lines.forEach(line => {
-            needsPage(LINE_H);
+            needsPage(lineH());
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillStyle = textColor;
-            ctx.font = `400 14px ${BODY_FONT}`;
+            ctx.font = `400 ${fs(14)}px ${BODY_FONT}`;
             ctx.letterSpacing = '0.2px';
             letterpress(ctx, line, PAD, curY);
-            curY += LINE_H;
+            curY += lineH();
           });
           curY += 10;
           return;
         }
 
         if (item.type === 'bullets') {
-          ctx.font = `400 13px ${BODY_FONT}`;
+          ctx.font = `400 ${fs(13)}px ${BODY_FONT}`;
           ctx.letterSpacing = '0.2px';
           item.items.forEach(b => {
             const lines = wrapText(ctx, b, TEXT_W - 20);
             lines.forEach((line, i) => {
-              needsPage(LINE_H - 2);
+              needsPage(lineH() - 2);
               ctx.textAlign = 'left';
               ctx.textBaseline = 'top';
               ctx.fillStyle = textColor;
-              ctx.font = `400 13px ${BODY_FONT}`;
+              ctx.font = `400 ${fs(13)}px ${BODY_FONT}`;
               ctx.letterSpacing = '0.2px';
               if (i === 0) letterpress(ctx, '\u2014', PAD + 4, curY);
               letterpress(ctx, line, PAD + 20, curY);
-              curY += LINE_H - 2;
+              curY += lineH() - 2;
             });
             curY += 6;
           });
@@ -445,7 +446,7 @@
           const col2 = PAD + 90;
           const col3 = PAD + 260;
           needsPage(item.rows.length * 28 + 20);
-          ctx.font = `400 12px ${BODY_FONT}`;
+          ctx.font = `400 ${fs(12)}px ${BODY_FONT}`;
           ctx.letterSpacing = '0.2px';
           ctx.fillStyle = textColor;
           ctx.textAlign = 'left';
@@ -572,7 +573,7 @@
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#3a3632';
-        ctx.font = `400 20px ${SC}`;
+        ctx.font = `400 ${fs(20)}px ${SC}`;
         ctx.letterSpacing = '6px';
         letterpress(ctx, 'Brief', PAGE_W / 2, startY);
 
@@ -586,7 +587,7 @@
 
         ctx.textAlign = 'left';
         ctx.fillStyle = '#3a3632';
-        ctx.font = `400 14px ${SC}`;
+        ctx.font = `400 ${fs(14)}px ${SC}`;
         ctx.letterSpacing = '2px';
         letterpress(ctx, 're: Brian Richter', PAD, startY + 46);
 
@@ -661,11 +662,11 @@
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
         ctx.fillStyle = '#3a3632';
-        ctx.font = `400 18px ${SC}`;
+        ctx.font = `400 ${fs(18)}px ${SC}`;
         ctx.letterSpacing = '4px';
         letterpress(ctx, 'Praxis Project Proposal', PAGE_W / 2, startY);
 
-        ctx.font = `400 12px ${BODY_FONT}`;
+        ctx.font = `400 ${fs(12)}px ${BODY_FONT}`;
         ctx.letterSpacing = '0.5px';
         ctx.fillStyle = '#4a4540';
         letterpress(ctx, 'Secure and Privacy-Aware Digital Provenance Across Layered Ownership Systems', PAGE_W / 2, startY + 28);
@@ -678,7 +679,7 @@
         ctx.lineTo(PAGE_W - PAD, startY + 52);
         ctx.stroke();
 
-        ctx.font = `400 12px ${SC}`;
+        ctx.font = `400 ${fs(12)}px ${SC}`;
         ctx.letterSpacing = '1.5px';
         ctx.fillStyle = '#3a3632';
         ctx.textAlign = 'left';
@@ -723,8 +724,8 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#3a3632';
-      ctx.font = `400 ${16 * f}px ${SC}`;
-      ctx.letterSpacing = `${5 * f}px`;
+      ctx.font = `400 ${fs(16 * f)}px ${SC}`;
+      ctx.letterSpacing = `${fs(5 * f)}px`;
       letterpress(ctx, 'Connect', w / 2, 60 * f);
 
       ctx.shadowColor = 'transparent';
@@ -743,14 +744,14 @@
 
         ctx.textAlign = 'right';
         ctx.fillStyle = '#8a8580';
-        ctx.font = `400 ${12 * f}px ${SC}`;
-        ctx.letterSpacing = `${2 * f}px`;
+        ctx.font = `400 ${fs(12 * f)}px ${SC}`;
+        ctx.letterSpacing = `${fs(2 * f)}px`;
         letterpress(ctx, link.label, w / 2 - 20 * f, y);
 
         ctx.textAlign = 'left';
         ctx.fillStyle = '#3a3632';
-        ctx.font = `400 ${14 * f}px ${BODY_FONT}`;
-        ctx.letterSpacing = `${0.5 * f}px`;
+        ctx.font = `400 ${fs(14 * f)}px ${BODY_FONT}`;
+        ctx.letterSpacing = `${fs(0.5 * f)}px`;
         letterpress(ctx, link.value, w / 2 + 20 * f, y);
       });
     }
@@ -817,98 +818,47 @@
         resizeTimer = setTimeout(renderAll, 200);
       });
 
-      // Pinch-to-zoom + pan
-      const stack = document.getElementById('megaStack');
-      let zoom = 1;
-      let panX = 0, panY = 0;
-      let isPinching = false;
-      let isDragging = false;
-
-      // Pinch state
+      // Pinch to scale font size — re-renders canvases with bigger text
       let pinchStartDist = 0;
-      let pinchStartZoom = 1;
-      let pinchStartMidX = 0, pinchStartMidY = 0;
-      let pinchStartPanX = 0, pinchStartPanY = 0;
+      let pinchStartScale = 1;
+      let pinchDebounce;
 
-      // Drag state (single finger pan when zoomed)
-      let dragStartX = 0, dragStartY = 0;
-      let dragStartPanX = 0, dragStartPanY = 0;
-      let dragMoved = false;
-
-      function dist(t) {
+      function touchDist(t) {
         const dx = t[0].clientX - t[1].clientX;
         const dy = t[0].clientY - t[1].clientY;
         return Math.sqrt(dx * dx + dy * dy);
       }
 
-      function apply() {
-        if (zoom <= 1) { zoom = 1; panX = 0; panY = 0; }
-        stack.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
-      }
-
-      stack.addEventListener('touchstart', (e) => {
+      document.addEventListener('touchstart', (e) => {
         if (e.touches.length === 2) {
-          isPinching = true;
-          isDragging = false;
           e.preventDefault();
-          pinchStartDist = dist(e.touches);
-          pinchStartZoom = zoom;
-          pinchStartMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-          pinchStartMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-          pinchStartPanX = panX;
-          pinchStartPanY = panY;
-        } else if (e.touches.length === 1 && zoom > 1) {
-          isDragging = true;
-          dragMoved = false;
-          dragStartX = e.touches[0].clientX;
-          dragStartY = e.touches[0].clientY;
-          dragStartPanX = panX;
-          dragStartPanY = panY;
-          e.preventDefault();
+          pinchStartDist = touchDist(e.touches);
+          pinchStartScale = fontScale;
         }
       }, { passive: false });
 
-      stack.addEventListener('touchmove', (e) => {
-        if (isPinching && e.touches.length === 2) {
+      document.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2) {
           e.preventDefault();
-          const d = dist(e.touches);
-          zoom = Math.max(1, Math.min(6, pinchStartZoom * (d / pinchStartDist)));
-          const mx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-          const my = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-          panX = pinchStartPanX + (mx - pinchStartMidX);
-          panY = pinchStartPanY + (my - pinchStartMidY);
-          apply();
-        } else if (isDragging && e.touches.length === 1) {
-          e.preventDefault();
-          const dx = e.touches[0].clientX - dragStartX;
-          const dy = e.touches[0].clientY - dragStartY;
-          if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragMoved = true;
-          panX = dragStartPanX + dx;
-          panY = dragStartPanY + dy;
-          apply();
-        }
-      }, { passive: false });
-
-      stack.addEventListener('touchend', (e) => {
-        if (e.touches.length < 2) isPinching = false;
-        if (e.touches.length === 0) {
-          // If we were dragging and moved, don't trigger click
-          if (isDragging && dragMoved) {
-            e.preventDefault();
+          const d = touchDist(e.touches);
+          const newScale = Math.max(1, Math.min(3, pinchStartScale * (d / pinchStartDist)));
+          if (Math.abs(newScale - fontScale) > 0.05) {
+            fontScale = Math.round(newScale * 10) / 10;
+            clearTimeout(pinchDebounce);
+            pinchDebounce = setTimeout(renderAll, 100);
           }
-          isDragging = false;
         }
-      });
+      }, { passive: false });
 
-      // Double-tap to reset zoom
+      // Double-tap to reset
       let lastTap = 0;
       document.addEventListener('touchend', (e) => {
         if (e.touches.length === 0) {
           const now = Date.now();
           if (now - lastTap < 300) {
-            zoom = 1; panX = 0; panY = 0;
-            apply();
             e.preventDefault();
+            fontScale = 1;
+            renderAll();
           }
           lastTap = now;
         }
