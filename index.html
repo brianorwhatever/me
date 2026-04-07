@@ -121,35 +121,6 @@
       border-color: rgba(180, 170, 155, 0.4);
     }
 
-    .zoom-btns {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    .zoom-btns button {
-      font-family: 'Crimson Pro', serif;
-      font-size: 13px;
-      font-weight: 400;
-      letter-spacing: 2px;
-      color: rgba(200, 190, 175, 0.5);
-      background: none;
-      border: 1px solid rgba(180, 170, 155, 0.15);
-      border-radius: 2px;
-      padding: 5px 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .zoom-btns button:hover {
-      color: rgba(230, 220, 205, 0.8);
-      border-color: rgba(180, 170, 155, 0.35);
-    }
-
-    .zoom-btns button.active {
-      color: rgba(230, 220, 205, 0.9);
-      border-color: rgba(180, 170, 155, 0.5);
-    }
 
     /* Mobile */
     @media (max-width: 860px) {
@@ -173,11 +144,6 @@
   <svg style="position:absolute;width:0;height:0"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></svg>
   <div class="mega-stack" id="megaStack"></div>
   <div class="cta">click for next</div>
-  <div class="zoom-btns">
-    <button class="active" data-scale="1">1x</button>
-    <button data-scale="2">2x</button>
-    <button data-scale="3">3x</button>
-  </div>
   <script>
     // Load fonts via FontFace API for reliable canvas rendering
     const fontData = [
@@ -223,10 +189,9 @@
       const dpr = window.devicePixelRatio || 1;
       const scale = isMobile ? 2 : 1;
       const w = 680 * scale;
-      const h = 388 * scale * fontScale;
-      const pad = 42 * scale * fontScale;
+      const h = 388 * scale;
+      const pad = 42 * scale;
       const canvas = document.createElement('canvas');
-      canvas.dataset.orientation = 'landscape';
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       container.appendChild(canvas);
@@ -264,101 +229,54 @@
       ctx.textAlign = 'left';
       ctx.textBaseline = 'top';
       ctx.fillStyle = textColor;
-      ctx.font = `300 ${fs(16 * f)}px ${SC}`;
-      ctx.letterSpacing = `${fs(1 * f)}px`;
+      ctx.font = `300 ${16 * f}px ${SC}`;
+      ctx.letterSpacing = `${1 * f}px`;
       lp(data.email, pad, pad);
 
       ctx.textAlign = 'right';
       ctx.fillStyle = textColor;
-      ctx.font = `400 ${fs(17 * f)}px ${SC}`;
-      ctx.letterSpacing = `${fs(1.5 * f)}px`;
+      ctx.font = `400 ${17 * f}px ${SC}`;
+      ctx.letterSpacing = `${1.5 * f}px`;
       lp(data.companyLine1, w - pad, pad);
 
       ctx.textBaseline = 'middle';
       ctx.fillStyle = nameColor;
       const nameY = h * 0.46;
 
-      ctx.font = `400 ${fs(22 * f)}px ${SC}`;
-      ctx.letterSpacing = `${fs(3 * f)}px`;
+      ctx.font = `400 ${22 * f}px ${SC}`;
+      ctx.letterSpacing = `${3 * f}px`;
       const firstW = ctx.measureText(data.firstName).width;
-      ctx.font = `400 ${fs(27 * f)}px ${REG}`;
-      ctx.letterSpacing = `${fs(4 * f)}px`;
+      ctx.font = `400 ${27 * f}px ${REG}`;
+      ctx.letterSpacing = `${4 * f}px`;
       const lastW = ctx.measureText(data.lastName).width;
-      const gap = fs(9 * f);
+      const gap = 9 * f;
       const startX = (w - firstW - gap - lastW) / 2;
 
       ctx.textAlign = 'left';
       ctx.fillStyle = nameColor;
-      ctx.font = `400 ${fs(22 * f)}px ${SC}`;
-      ctx.letterSpacing = `${fs(3 * f)}px`;
+      ctx.font = `400 ${22 * f}px ${SC}`;
+      ctx.letterSpacing = `${3 * f}px`;
       lp(data.firstName, startX, nameY);
       ctx.fillStyle = nameColor;
-      ctx.font = `400 ${fs(27 * f)}px ${REG}`;
-      ctx.letterSpacing = `${fs(4 * f)}px`;
+      ctx.font = `400 ${27 * f}px ${REG}`;
+      ctx.letterSpacing = `${4 * f}px`;
       lp(data.lastName, startX + firstW + gap, nameY);
 
       ctx.textAlign = 'center';
       ctx.fillStyle = textColor;
-      ctx.font = `300 ${fs(16 * f)}px ${SC}`;
-      ctx.letterSpacing = `${fs(2.5 * f)}px`;
-      lp(data.title, w / 2, nameY + fs(35 * f));
+      ctx.font = `300 ${16 * f}px ${SC}`;
+      ctx.letterSpacing = `${2.5 * f}px`;
+      lp(data.title, w / 2, nameY + 35 * f);
 
       ctx.fillStyle = '#5a5550';
-      ctx.font = `300 ${fs(12 * f)}px ${SC}`;
-      ctx.letterSpacing = `${fs(0.8 * f)}px`;
+      ctx.font = `300 ${12 * f}px ${SC}`;
+      ctx.letterSpacing = `${0.8 * f}px`;
       lp(data.bottomLine, w / 2, h - pad);
     }
 
-    function wrapText(ctx, text, maxWidth) {
-      const words = text.split(' ');
-      const lines = [];
-      let line = '';
-      for (const word of words) {
-        const test = line ? line + ' ' + word : word;
-        if (ctx.measureText(test).width > maxWidth && line) {
-          lines.push(line);
-          line = word;
-        } else {
-          line = test;
-        }
-      }
-      if (line) lines.push(line);
-      return lines;
-    }
 
     // --- Shared paginated document renderer ---
-    const BODY_FONT = '"Crimson Pro", serif';
-    let fontScale = 1;
-    function fs(px) { return px * fontScale; }
-    function lineH() { return 24 * fontScale; }
-    const PAGE_W = 680;
-    const PAGE_H = Math.round(PAGE_W * (11 / 8.5));
-    const PAD = 55;
-    const TEXT_W = PAGE_W - PAD * 2;
 
-    function createPage(container) {
-      const dpr = window.devicePixelRatio || 1;
-      const canvas = document.createElement('canvas');
-      canvas.dataset.orientation = 'portrait';
-      canvas.width = PAGE_W * dpr;
-      canvas.height = PAGE_H * dpr;
-      container.appendChild(canvas);
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
-
-      // Draw page background
-      ctx.fillStyle = '#ede8df';
-      ctx.beginPath();
-      ctx.roundRect(0, 0, PAGE_W, PAGE_H, 3);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
-      ctx.lineWidth = 0.5;
-      ctx.beginPath();
-      ctx.roundRect(0.5, 0.5, PAGE_W - 1, PAGE_H - 1, 3);
-      ctx.stroke();
-
-      return ctx;
-    }
 
     function letterpress(ctx, text, x, y) {
       ctx.shadowColor = 'rgba(0,0,0,0.15)';
@@ -373,129 +291,6 @@
       ctx.shadowColor = 'transparent';
     }
 
-    // Renders content items across paginated canvases
-    function renderDocument(containerId, headerFn, content) {
-      const container = document.getElementById(containerId);
-      const maxY = PAGE_H - PAD;
-      let ctx = createPage(container);
-      let curY = PAD;
-
-      // Draw header on first page
-      curY = headerFn(ctx, curY);
-
-      const textColor = '#4a4540';
-
-      function needsPage(needed) {
-        if (curY + needed > maxY) {
-          ctx = createPage(container);
-          curY = PAD;
-        }
-      }
-
-      content.forEach(item => {
-        if (item.type === 'spacer') {
-          curY += fs(15);
-          return;
-        }
-
-        if (item.type === 'heading') {
-          needsPage(fs(35));
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'top';
-          ctx.fillStyle = '#3a3632';
-          ctx.font = `400 ${fs(15)}px ${SC}`;
-          ctx.letterSpacing = '2px';
-          letterpress(ctx, item.text, PAD, curY);
-          curY += fs(35);
-          return;
-        }
-
-        if (item.type === 'subheading') {
-          needsPage(fs(28));
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'top';
-          ctx.fillStyle = '#4a4540';
-          ctx.font = `400 ${fs(13)}px ${SC}`;
-          ctx.letterSpacing = '1.5px';
-          letterpress(ctx, item.text, PAD, curY);
-          curY += fs(28);
-          return;
-        }
-
-        if (item.type === 'para') {
-          ctx.font = `400 ${fs(14)}px ${BODY_FONT}`;
-          ctx.letterSpacing = '0.2px';
-          const lines = wrapText(ctx, item.text, TEXT_W);
-          lines.forEach(line => {
-            needsPage(lineH());
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'top';
-            ctx.fillStyle = textColor;
-            ctx.font = `400 ${fs(14)}px ${BODY_FONT}`;
-            ctx.letterSpacing = '0.2px';
-            letterpress(ctx, line, PAD, curY);
-            curY += lineH();
-          });
-          curY += fs(10);
-          return;
-        }
-
-        if (item.type === 'bullets') {
-          ctx.font = `400 ${fs(13)}px ${BODY_FONT}`;
-          ctx.letterSpacing = '0.2px';
-          item.items.forEach(b => {
-            const lines = wrapText(ctx, b, TEXT_W - 20);
-            lines.forEach((line, i) => {
-              needsPage(lineH() - 2);
-              ctx.textAlign = 'left';
-              ctx.textBaseline = 'top';
-              ctx.fillStyle = textColor;
-              ctx.font = `400 ${fs(13)}px ${BODY_FONT}`;
-              ctx.letterSpacing = '0.2px';
-              if (i === 0) letterpress(ctx, '\u2014', PAD + 4, curY);
-              letterpress(ctx, line, PAD + 20, curY);
-              curY += lineH() - 2;
-            });
-            curY += fs(6);
-          });
-          curY += fs(10);
-          return;
-        }
-
-        if (item.type === 'table') {
-          const col1 = PAD;
-          const col2 = PAD + fs(90);
-          const col3 = PAD + fs(260);
-          needsPage(item.rows.length * fs(28) + fs(20));
-          ctx.font = `400 ${fs(12)}px ${BODY_FONT}`;
-          ctx.letterSpacing = '0.2px';
-          ctx.fillStyle = textColor;
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'top';
-
-          ctx.strokeStyle = 'rgba(160, 150, 135, 0.25)';
-          ctx.lineWidth = 0.5;
-          ctx.beginPath();
-          ctx.moveTo(PAD, curY - 4);
-          ctx.lineTo(PAGE_W - PAD, curY - 4);
-          ctx.stroke();
-
-          item.rows.forEach(row => {
-            letterpress(ctx, row[0], col1, curY);
-            letterpress(ctx, row[1], col2, curY);
-            letterpress(ctx, row[2], col3, curY);
-            curY += fs(28);
-          });
-
-          ctx.beginPath();
-          ctx.moveTo(PAD, curY - fs(12));
-          ctx.lineTo(PAGE_W - PAD, curY - fs(12));
-          ctx.stroke();
-          curY += fs(20);
-          return;
-        }
-      });
-    }
 
     // Link registry: pageIndex -> array of { href, top%, left%, width%, height% }
     const pageLinks = {};
@@ -581,143 +376,82 @@
       });
     }
 
-    // --- Brief ---
-    function drawBrief() {
-      const briefContent = [
-        { type: 'para', text: 'Brian Richter is the founder and chief executive officer of Aviary Tech, a company dedicated to Decentralized Identity. His work centers on the W3C standards for Decentralized Identifiers and Verifiable Credentials, building the infrastructure for digital identity that is self-sovereign, portable, and interoperable. The premise is simple: identity should not depend on any single platform or authority.' },
-        { type: 'para', text: 'He is also a software engineer at Codex and Defined. Codex indexes real-time data for over seventy million tokens across more than eighty blockchain networks, delivering pricing, charts, wallet balances, and market analytics with sub-second latency. Their clients include Coinbase, Uniswap, MoonPay, and Farcaster. Defined provides the analytics and discovery layer built on this infrastructure.' },
-        { type: 'para', text: 'He is the creator of Originals, a minimal protocol for creating, discovering, and transferring digital assets with cryptographically verifiable provenance. Assets are represented by Decentralized Identifiers and Verifiable Credentials that migrate through three layers: private, public, and transferable. Ownership settles exclusively on Bitcoin, ensuring that economic value is secured by the most resilient consensus network in existence. The protocol requires no smart contracts, no trusted third parties, and no bespoke blockchains.' },
-        { type: 'para', text: 'He is currently preparing a Praxis project proposal for the University of Victoria Doctor of Engineering program, also known as LEAP: Leadership in Engineering Applications and Practice. The DEng is Canada\'s first professional doctorate in engineering, designed for senior practitioners conducting applied research. Details are forthcoming.' }
-      ];
 
-      renderDocument('megaStack', (ctx, startY) => {
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillStyle = '#3a3632';
-        ctx.font = `400 ${fs(20)}px ${SC}`;
-        ctx.letterSpacing = '6px';
-        letterpress(ctx, 'Brief', PAGE_W / 2, startY);
+    function drawDocsCard(container) {
+      const dpr = window.devicePixelRatio || 1;
+      const scale = isMobile ? 2 : 1;
+      const w = 680 * scale;
+      const h = 388 * scale;
+      const f = scale;
+      const canvas = document.createElement('canvas');
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      container.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
 
+      ctx.fillStyle = '#ede8df';
+      ctx.beginPath();
+      ctx.roundRect(0, 0, w, h, 3 * f);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
+      ctx.lineWidth = 0.5 * f;
+      ctx.beginPath();
+      ctx.roundRect(0.5, 0.5, w - 1, h - 1, 3 * f);
+      ctx.stroke();
+
+      function lp(text, x, y) {
+        ctx.shadowColor = 'rgba(0,0,0,0.15)';
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = -0.5 * f;
+        ctx.shadowBlur = 0.5 * f;
+        ctx.fillText(text, x, y);
+        ctx.shadowColor = 'rgba(255,255,255,0.6)';
+        ctx.shadowOffsetY = 1 * f;
+        ctx.shadowBlur = 0;
+        ctx.fillText(text, x, y);
         ctx.shadowColor = 'transparent';
-        ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(PAD, startY + fs(32));
-        ctx.lineTo(PAGE_W - PAD, startY + fs(32));
-        ctx.stroke();
+      }
 
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#3a3632';
-        ctx.font = `400 ${fs(14)}px ${SC}`;
-        ctx.letterSpacing = '2px';
-        letterpress(ctx, 're: Brian Richter', PAD, startY + fs(46));
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#3a3632';
+      ctx.font = `400 ${16 * f}px ${SC}`;
+      ctx.letterSpacing = `${5 * f}px`;
+      lp('Documents', w / 2, 70 * f);
 
-        return startY + fs(80);
-      }, briefContent);
-    }
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
+      ctx.lineWidth = 0.5 * f;
+      ctx.beginPath();
+      ctx.moveTo(w * 0.3, 95 * f);
+      ctx.lineTo(w * 0.7, 95 * f);
+      ctx.stroke();
 
-    // --- Proposal ---
-    function drawProposal() {
-      const proposalContent = [
-        { type: 'heading', text: '1. Problem and Opportunity' },
-        { type: 'para', text: 'A photographer publishes a limited-edition digital print. Over time, the work is collected, resold, and eventually exhibited online \u2014 but no single system can tell the full story of its creation, authenticity, and chain of custody. The photographer\u2019s original signing event is tied to a platform that may disappear. A collector\u2019s proof of ownership lives in a marketplace database. And anyone who wants to verify the work\u2019s history must trust several intermediaries whose authority is never clearly stated.' },
-        { type: 'para', text: 'This scenario illustrates three linked problems in digital provenance today. First, provenance is fragile \u2014 a claim of authenticity often depends on infrastructure outside the asset itself. Second, trust assumptions are opaque \u2014 users rely on custodians without a clear account of what those actors can and cannot do. Third, privacy is poorly handled \u2014 public systems overexpose metadata while private workflows sacrifice auditability.' },
-        { type: 'para', text: 'This praxis addresses those problems by studying how digital provenance, ownership transfer, and selective disclosure can be composed into a single layered protocol.' },
-        { type: 'spacer' },
-        { type: 'heading', text: '2. Proposed Praxis' },
-        { type: 'para', text: 'The proposed praxis extends the Originals protocol \u2014 an existing multi-layer digital asset provenance system built by Aviary Tech \u2014 into a research-grade cryptographic systems project organized around layered ownership states. The concrete artifact is a protocol implementation comprising an SDK, DID-method libraries, a Bitcoin inscription layer, and a privacy-aware credential engine, evaluated against explicit security and privacy criteria.' },
-        { type: 'para', text: 'The protocol is organized into four layers, each corresponding to a distinct class of trust requirement:' },
-        { type: 'bullets', items: [
-          'Private creation and local provenance \u2014 assets begin in low-cost, offline environments where provenance events can be recorded without publication.',
-          'Public discovery and selective disclosure \u2014 assets become discoverable through web-addressable identifiers while preserving control over which claims become public.',
-          'High-assurance ownership transfer \u2014 assets transition into stronger ownership environments with explicit verification rules.',
-          'Advanced ownership transitions \u2014 constrained shared-ownership or fractional-rights workflows supported as an application layer.'
-        ]},
-        { type: 'spacer' },
-        { type: 'heading', text: '3. Contribution Boundary' },
-        { type: 'para', text: 'The doctoral contribution is the systematic security, privacy, and trust evaluation of a layered provenance architecture \u2014 producing the adversary models, privacy tradeoff analysis, structured threat assessment, and empirical evidence that reveal where the architecture\u2019s guarantees hold, where they weaken, and what they cost.' },
-        { type: 'para', text: 'This praxis builds on a substantial existing engineering practice. The Originals protocol implementation comprises over 1,100 commits and already includes a working did:btco resolver and inscriber, verifiable credential issuance and verification, and an initial BBS selective disclosure library. The doctoral contribution begins where the engineering practice becomes the subject of systematic investigation.' },
-        { type: 'spacer' },
-        { type: 'heading', text: '4. Research Questions' },
-        { type: 'bullets', items: [
-          'How should a layered provenance protocol be modeled so that transitions between private, public, and high-value ownership states preserve clearly stated security guarantees?',
-          'Which privacy properties are most valuable in provenance systems, and what cryptographic mechanisms can support them without undermining public verifiability?',
-          'How can provenance claims, ownership records, and selective disclosure be composed so that users can audit authenticity without exposing unnecessary information?'
-        ]},
-        { type: 'spacer' },
-        { type: 'heading', text: '5. Methodology' },
-        { type: 'para', text: 'The project proceeds in four phases.' },
-        { type: 'subheading', text: 'Phase 1: Security Model and Provenance Core' },
-        { type: 'para', text: 'Formalizes the protocol structure for creation, discovery, and ownership transfer. Defines participants, adversaries, trust assumptions, and security goals. Produces a reference specification, verification invariants, and an implementation baseline.' },
-        { type: 'subheading', text: 'Phase 2: Privacy-Aware Provenance' },
-        { type: 'para', text: 'Integrates privacy-preserving techniques into provenance workflows. The primary mechanism is BBS selective disclosure, enabling holders to derive proofs that reveal only selected credential attributes while preserving verifiability. Evaluates how selective disclosure composes with provenance claims across layer transitions.' },
-        { type: 'subheading', text: 'Phase 3: Ownership Transition and Shared Rights' },
-        { type: 'para', text: 'Examines how the protocol supports constrained ownership partitioning or governance-based transfer scenarios. Includes comparative trust analysis of specific operator constraints against a trusted-operator baseline. Intentionally bounded so the dissertation remains viable if only a constrained prototype is completed.' },
-        { type: 'subheading', text: 'Phase 4: Evaluation' },
-        { type: 'para', text: 'Produces the empirical and analytical evidence needed for a strong praxis outcome. Includes STRIDE-based threat analysis with at least 15 specific threat scenarios, adversarial test suites, benchmark comparisons across deployment paths, and comparison against existing provenance systems.' },
-        { type: 'spacer' },
-        { type: 'heading', text: '6. Timeline' },
-        { type: 'table', rows: [
-          ['Phase 1', 'Q4 2026 \u2013 Q2 2027', 'Security model, core protocol spec'],
-          ['Phase 2', 'Q3 2027 \u2013 Q1 2028', 'BBS selective disclosure, privacy analysis'],
-          ['Phase 3', 'Q2 2028 \u2013 Q4 2028', 'Advanced ownership transitions, prototype'],
-          ['Phase 4', 'Q1 2029 \u2013 Q3 2029', 'Evaluation, benchmarks, dissertation']
-        ]},
-        { type: 'spacer' },
-        { type: 'heading', text: '7. Deliverables' },
-        { type: 'bullets', items: [
-          'A layered digital provenance protocol specification',
-          'A reference implementation and verification toolkit',
-          'A privacy-aware provenance design and evaluation',
-          'A bounded prototype for advanced ownership transitions',
-          'Performance, threat, and privacy analyses with defined comparison baselines',
-          'A DEng praxis dissertation integrating the architecture, implementation, and evidence'
-        ]},
-        { type: 'spacer' },
-        { type: 'heading', text: '8. Expected Contribution' },
-        { type: 'para', text: 'The main contribution of this praxis is a practical framework for secure and privacy-aware digital provenance across multiple ownership layers \u2014 independent of any single platform, application, or commercial deployment. Whether or not Aviary Tech or Codex continue to operate, the protocol architecture, trust analysis, privacy evaluation, and open-source implementation remain a reusable contribution to engineering knowledge.' },
-        { type: 'para', text: 'The strongest outcome is not merely a new application. It is a reusable architecture, implementation, and evidence base whose value does not depend on a specific commercial context.' },
-      ];
+      ctx.fillStyle = '#3a3632';
+      ctx.font = `400 ${14 * f}px ${SC}`;
+      ctx.letterSpacing = `${3 * f}px`;
+      lp('Brief', w / 2, 160 * f);
 
-      renderDocument('megaStack', (ctx, startY) => {
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'top';
-        ctx.fillStyle = '#3a3632';
-        ctx.font = `400 ${fs(18)}px ${SC}`;
-        ctx.letterSpacing = '4px';
-        letterpress(ctx, 'Praxis Project Proposal', PAGE_W / 2, startY);
+      ctx.strokeStyle = 'rgba(160, 150, 135, 0.2)';
+      ctx.beginPath();
+      ctx.moveTo(w * 0.4, 200 * f);
+      ctx.lineTo(w * 0.6, 200 * f);
+      ctx.stroke();
 
-        ctx.font = `400 ${fs(12)}px ${BODY_FONT}`;
-        ctx.letterSpacing = '0.5px';
-        ctx.fillStyle = '#4a4540';
-        letterpress(ctx, 'Secure and Privacy-Aware Digital Provenance Across Layered Ownership Systems', PAGE_W / 2, startY + fs(28));
-
-        ctx.shadowColor = 'transparent';
-        ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        ctx.moveTo(PAD, startY + fs(52));
-        ctx.lineTo(PAGE_W - PAD, startY + fs(52));
-        ctx.stroke();
-
-        ctx.font = `400 ${fs(12)}px ${SC}`;
-        ctx.letterSpacing = '1.5px';
-        ctx.fillStyle = '#3a3632';
-        ctx.textAlign = 'left';
-        letterpress(ctx, 'Brian Richter  \u00b7  Aviary Tech  \u00b7  University of Victoria  \u00b7  April 2026', PAD, startY + fs(62));
-
-        return startY + fs(90);
-      }, proposalContent);
+      ctx.fillStyle = '#3a3632';
+      ctx.font = `400 ${14 * f}px ${SC}`;
+      ctx.letterSpacing = `${3 * f}px`;
+      lp('Praxis Project Proposal', w / 2, 250 * f);
     }
 
     function drawSocials(container) {
       const dpr = window.devicePixelRatio || 1;
       const scale = isMobile ? 2 : 1;
       const w = 680 * scale;
-      const h = 388 * scale * fontScale;
+      const h = 388 * scale;
       const f = scale;
       const canvas = document.createElement('canvas');
-      canvas.dataset.orientation = 'landscape';
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       container.appendChild(canvas);
@@ -745,35 +479,35 @@
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#3a3632';
-      ctx.font = `400 ${fs(16 * f)}px ${SC}`;
-      ctx.letterSpacing = `${fs(5 * f)}px`;
-      letterpress(ctx, 'Connect', w / 2, fs(60 * f));
+      ctx.font = `400 ${16 * f}px ${SC}`;
+      ctx.letterSpacing = `${5 * f}px`;
+      letterpress(ctx, 'Connect', w / 2, 60 * f);
 
       ctx.shadowColor = 'transparent';
       ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
       ctx.lineWidth = 0.5 * f;
       ctx.beginPath();
-      ctx.moveTo(w * 0.35, fs(80 * f));
-      ctx.lineTo(w * 0.65, fs(80 * f));
+      ctx.moveTo(w * 0.35, 80 * f);
+      ctx.lineTo(w * 0.65, 80 * f);
       ctx.stroke();
 
-      const startY = fs(120 * f);
-      const gap = fs(46 * f);
+      const startY = 120 * f;
+      const gap = 46 * f;
 
       links.forEach((link, i) => {
         const y = startY + i * gap;
 
         ctx.textAlign = 'right';
         ctx.fillStyle = '#8a8580';
-        ctx.font = `400 ${fs(12 * f)}px ${SC}`;
-        ctx.letterSpacing = `${fs(2 * f)}px`;
-        letterpress(ctx, link.label, w / 2 - fs(20 * f), y);
+        ctx.font = `400 ${12 * f}px ${SC}`;
+        ctx.letterSpacing = `${2 * f}px`;
+        letterpress(ctx, link.label, w / 2 - 20 * f, y);
 
         ctx.textAlign = 'left';
         ctx.fillStyle = '#3a3632';
-        ctx.font = `400 ${fs(14 * f)}px ${BODY_FONT}`;
-        ctx.letterSpacing = `${fs(0.5 * f)}px`;
-        letterpress(ctx, link.value, w / 2 + fs(20 * f), y);
+        ctx.font = `400 ${14 * f}px "Crimson Pro", serif`;
+        ctx.letterSpacing = `${0.5 * f}px`;
+        letterpress(ctx, link.value, w / 2 + 20 * f, y);
       });
     }
 
@@ -802,13 +536,15 @@
         ]);
       });
 
-      // 2. Brief pages
-      drawBrief();
+      // 2. Documents card
+      const docsIdx = pageCount();
+      drawDocsCard(stack);
+      registerLinks(docsIdx, [
+        { href: 'brief.html', top: '35%', left: '10%', width: '80%', height: '20%' },
+        { href: 'praxis.html', top: '60%', left: '10%', width: '80%', height: '20%' },
+      ]);
 
-      // 3. Proposal pages
-      drawProposal();
-
-      // 4. Social links page
+      // 3. Social links page
       const socialsIdx = pageCount();
       drawSocials(stack);
       registerLinks(socialsIdx, [
@@ -839,16 +575,6 @@
         resizeTimer = setTimeout(renderAll, 200);
       });
 
-      // Font scale buttons
-      document.querySelectorAll('.zoom-btns button').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const newScale = parseFloat(btn.dataset.scale);
-          if (newScale === fontScale) return;
-          fontScale = newScale;
-          document.querySelectorAll('.zoom-btns button').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          renderAll();
-        });
       });
     });
   </script>
