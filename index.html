@@ -223,8 +223,8 @@
       const dpr = window.devicePixelRatio || 1;
       const scale = isMobile ? 2 : 1;
       const w = 680 * scale;
-      const h = 388 * scale;
-      const pad = 42 * scale;
+      const h = 388 * scale * fontScale;
+      const pad = 42 * scale * fontScale;
       const canvas = document.createElement('canvas');
       canvas.dataset.orientation = 'landscape';
       canvas.width = w * dpr;
@@ -284,7 +284,7 @@
       ctx.font = `400 ${fs(27 * f)}px ${REG}`;
       ctx.letterSpacing = `${fs(4 * f)}px`;
       const lastW = ctx.measureText(data.lastName).width;
-      const gap = 9 * f;
+      const gap = fs(9 * f);
       const startX = (w - firstW - gap - lastW) / 2;
 
       ctx.textAlign = 'left';
@@ -301,7 +301,7 @@
       ctx.fillStyle = textColor;
       ctx.font = `300 ${fs(16 * f)}px ${SC}`;
       ctx.letterSpacing = `${fs(2.5 * f)}px`;
-      lp(data.title, w / 2, nameY + 35 * f);
+      lp(data.title, w / 2, nameY + fs(35 * f));
 
       ctx.fillStyle = '#5a5550';
       ctx.font = `300 ${fs(12 * f)}px ${SC}`;
@@ -394,31 +394,31 @@
 
       content.forEach(item => {
         if (item.type === 'spacer') {
-          curY += 15;
+          curY += fs(15);
           return;
         }
 
         if (item.type === 'heading') {
-          needsPage(35);
+          needsPage(fs(35));
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillStyle = '#3a3632';
           ctx.font = `400 ${fs(15)}px ${SC}`;
           ctx.letterSpacing = '2px';
           letterpress(ctx, item.text, PAD, curY);
-          curY += 35;
+          curY += fs(35);
           return;
         }
 
         if (item.type === 'subheading') {
-          needsPage(28);
+          needsPage(fs(28));
           ctx.textAlign = 'left';
           ctx.textBaseline = 'top';
           ctx.fillStyle = '#4a4540';
           ctx.font = `400 ${fs(13)}px ${SC}`;
           ctx.letterSpacing = '1.5px';
           letterpress(ctx, item.text, PAD, curY);
-          curY += 28;
+          curY += fs(28);
           return;
         }
 
@@ -436,7 +436,7 @@
             letterpress(ctx, line, PAD, curY);
             curY += lineH();
           });
-          curY += 10;
+          curY += fs(10);
           return;
         }
 
@@ -456,17 +456,17 @@
               letterpress(ctx, line, PAD + 20, curY);
               curY += lineH() - 2;
             });
-            curY += 6;
+            curY += fs(6);
           });
-          curY += 10;
+          curY += fs(10);
           return;
         }
 
         if (item.type === 'table') {
           const col1 = PAD;
-          const col2 = PAD + 90;
-          const col3 = PAD + 260;
-          needsPage(item.rows.length * 28 + 20);
+          const col2 = PAD + fs(90);
+          const col3 = PAD + fs(260);
+          needsPage(item.rows.length * fs(28) + fs(20));
           ctx.font = `400 ${fs(12)}px ${BODY_FONT}`;
           ctx.letterSpacing = '0.2px';
           ctx.fillStyle = textColor;
@@ -484,14 +484,14 @@
             letterpress(ctx, row[0], col1, curY);
             letterpress(ctx, row[1], col2, curY);
             letterpress(ctx, row[2], col3, curY);
-            curY += 28;
+            curY += fs(28);
           });
 
           ctx.beginPath();
-          ctx.moveTo(PAD, curY - 12);
-          ctx.lineTo(PAGE_W - PAD, curY - 12);
+          ctx.moveTo(PAD, curY - fs(12));
+          ctx.lineTo(PAGE_W - PAD, curY - fs(12));
           ctx.stroke();
-          curY += 20;
+          curY += fs(20);
           return;
         }
       });
@@ -602,17 +602,17 @@
         ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
         ctx.lineWidth = 0.5;
         ctx.beginPath();
-        ctx.moveTo(PAD, startY + 32);
-        ctx.lineTo(PAGE_W - PAD, startY + 32);
+        ctx.moveTo(PAD, startY + fs(32));
+        ctx.lineTo(PAGE_W - PAD, startY + fs(32));
         ctx.stroke();
 
         ctx.textAlign = 'left';
         ctx.fillStyle = '#3a3632';
         ctx.font = `400 ${fs(14)}px ${SC}`;
         ctx.letterSpacing = '2px';
-        letterpress(ctx, 're: Brian Richter', PAD, startY + 46);
+        letterpress(ctx, 're: Brian Richter', PAD, startY + fs(46));
 
-        return startY + 80;
+        return startY + fs(80);
       }, briefContent);
     }
 
@@ -690,23 +690,23 @@
         ctx.font = `400 ${fs(12)}px ${BODY_FONT}`;
         ctx.letterSpacing = '0.5px';
         ctx.fillStyle = '#4a4540';
-        letterpress(ctx, 'Secure and Privacy-Aware Digital Provenance Across Layered Ownership Systems', PAGE_W / 2, startY + 28);
+        letterpress(ctx, 'Secure and Privacy-Aware Digital Provenance Across Layered Ownership Systems', PAGE_W / 2, startY + fs(28));
 
         ctx.shadowColor = 'transparent';
         ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
         ctx.lineWidth = 0.5;
         ctx.beginPath();
-        ctx.moveTo(PAD, startY + 52);
-        ctx.lineTo(PAGE_W - PAD, startY + 52);
+        ctx.moveTo(PAD, startY + fs(52));
+        ctx.lineTo(PAGE_W - PAD, startY + fs(52));
         ctx.stroke();
 
         ctx.font = `400 ${fs(12)}px ${SC}`;
         ctx.letterSpacing = '1.5px';
         ctx.fillStyle = '#3a3632';
         ctx.textAlign = 'left';
-        letterpress(ctx, 'Brian Richter  \u00b7  Aviary Tech  \u00b7  University of Victoria  \u00b7  April 2026', PAD, startY + 62);
+        letterpress(ctx, 'Brian Richter  \u00b7  Aviary Tech  \u00b7  University of Victoria  \u00b7  April 2026', PAD, startY + fs(62));
 
-        return startY + 90;
+        return startY + fs(90);
       }, proposalContent);
     }
 
@@ -714,7 +714,7 @@
       const dpr = window.devicePixelRatio || 1;
       const scale = isMobile ? 2 : 1;
       const w = 680 * scale;
-      const h = 388 * scale;
+      const h = 388 * scale * fontScale;
       const f = scale;
       const canvas = document.createElement('canvas');
       canvas.dataset.orientation = 'landscape';
@@ -747,18 +747,18 @@
       ctx.fillStyle = '#3a3632';
       ctx.font = `400 ${fs(16 * f)}px ${SC}`;
       ctx.letterSpacing = `${fs(5 * f)}px`;
-      letterpress(ctx, 'Connect', w / 2, 60 * f);
+      letterpress(ctx, 'Connect', w / 2, fs(60 * f));
 
       ctx.shadowColor = 'transparent';
       ctx.strokeStyle = 'rgba(160, 150, 135, 0.35)';
       ctx.lineWidth = 0.5 * f;
       ctx.beginPath();
-      ctx.moveTo(w * 0.35, 80 * f);
-      ctx.lineTo(w * 0.65, 80 * f);
+      ctx.moveTo(w * 0.35, fs(80 * f));
+      ctx.lineTo(w * 0.65, fs(80 * f));
       ctx.stroke();
 
-      const startY = 120 * f;
-      const gap = 46 * f;
+      const startY = fs(120 * f);
+      const gap = fs(46 * f);
 
       links.forEach((link, i) => {
         const y = startY + i * gap;
@@ -767,13 +767,13 @@
         ctx.fillStyle = '#8a8580';
         ctx.font = `400 ${fs(12 * f)}px ${SC}`;
         ctx.letterSpacing = `${fs(2 * f)}px`;
-        letterpress(ctx, link.label, w / 2 - 20 * f, y);
+        letterpress(ctx, link.label, w / 2 - fs(20 * f), y);
 
         ctx.textAlign = 'left';
         ctx.fillStyle = '#3a3632';
         ctx.font = `400 ${fs(14 * f)}px ${BODY_FONT}`;
         ctx.letterSpacing = `${fs(0.5 * f)}px`;
-        letterpress(ctx, link.value, w / 2 + 20 * f, y);
+        letterpress(ctx, link.value, w / 2 + fs(20 * f), y);
       });
     }
 
