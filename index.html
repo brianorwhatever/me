@@ -121,6 +121,28 @@
       border-color: rgba(180, 170, 155, 0.4);
     }
 
+    .doc-links {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .doc-links a {
+      font-family: 'Cormorant SC', serif;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 3px;
+      color: rgba(200, 190, 175, 0.6);
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .doc-links a:hover {
+      color: rgba(230, 220, 205, 0.9);
+    }
+
 
     /* Mobile */
     @media (max-width: 860px) {
@@ -144,6 +166,10 @@
   <svg style="position:absolute;width:0;height:0"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter></svg>
   <div class="mega-stack" id="megaStack"></div>
   <div class="cta">click for next</div>
+  <div class="doc-links">
+    <a href="brief.html">Brief</a>
+    <a href="praxis.html">Praxis Project Proposal</a>
+  </div>
   <script>
     // Load fonts via FontFace API for reliable canvas rendering
     const fontData = [
